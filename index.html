@@ -50,7 +50,6 @@
 
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         
-        /* Ajuste de segurança para o topo do iPhone (Notch / Ilha Dinâmica) sem afetar o Android */
         @supports (-webkit-touch-callout: default) {
             header {
                 padding-top: calc(20px + env(safe-area-inset-top)) !important;
@@ -100,6 +99,29 @@
         .pendencia-value.pagar { color: var(--danger); }
         .pendencia-value.receber { color: var(--success); }
         .pendencia-value.faturas { color: var(--warning); }
+
+        /* ESTILOS DOS NOVOS WIDGETS DE AÇÕES RÁPIDAS */
+        .quick-widget-card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); width: 100%; position: relative; }
+        .quick-widget-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .quick-widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .quick-action-btn { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid transparent; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: transform 0.15s, background 0.2s; text-align: left; }
+        .quick-action-btn:active { transform: scale(0.97); }
+        .quick-action-btn.expense { background: rgba(239, 68, 68, 0.12); color: var(--danger); border-color: rgba(239, 68, 68, 0.25); }
+        .quick-action-btn.income { background: rgba(16, 185, 129, 0.12); color: var(--success); border-color: rgba(16, 185, 129, 0.25); }
+        .quick-action-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .quick-action-btn.expense .quick-action-icon { background: var(--danger); color: white; }
+        .quick-action-btn.income .quick-action-icon { background: var(--success); color: white; }
+        .quick-action-text span { display: block; font-size: 0.7rem; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+
+        .express-toggle-btn { width: 100%; margin-top: 12px; padding: 8px; background: var(--bg); border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .express-form-box { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+        .express-form-box.active { display: block; }
+        .express-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .express-row-bottom { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+        .express-input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; background: var(--bg); color: var(--text); outline: none; }
+        .express-submit-btn { padding: 0 14px; border-radius: 8px; border: none; color: white; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .express-submit-btn.exp { background: var(--danger); }
+        .express-submit-btn.inc { background: var(--success); }
 
         .container { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
         .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 20px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
@@ -488,7 +510,19 @@
         let transactions = JSON.parse(localStorage.getItem('lucas_txs_v89')) || [];
         let vaults = JSON.parse(localStorage.getItem('lucas_vaults_v89')) || [];
         let wallet = JSON.parse(localStorage.getItem('lucas_wallet_v89')) || { name: "Carteira", balance: 0 };
-        let homeConfig = JSON.parse(localStorage.getItem('lucas_homecfg_v89')) || { order: ['netBalance', 'pendenciasCard', 'categorySummary', 'transactionsPreview', 'chartsPreview', 'vaultPreview'], visibility: { netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false } };
+        
+        let homeConfig = JSON.parse(localStorage.getItem('lucas_homecfg_v89')) || { 
+            order: ['quickActionsWidget', 'netBalance', 'pendenciasCard', 'categorySummary', 'transactionsPreview', 'chartsPreview', 'vaultPreview'], 
+            visibility: { quickActionsWidget: true, netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false } 
+        };
+        
+        // Garante que o novo widget exista mesmo para quem já tinha configuração salva
+        if (!homeConfig.order.includes('quickActionsWidget')) {
+            homeConfig.order.unshift('quickActionsWidget');
+            if (homeConfig.visibility.quickActionsWidget === undefined) {
+                homeConfig.visibility.quickActionsWidget = true;
+            }
+        }
         
         let selectedMonthKey = "", currentType = 'Despesa', currentTxFilter = 'all', isPrivacyMode = false;
         let myChart = null, myBarChart = null, myTrendChart = null, calcExpression = "0";
@@ -546,7 +580,21 @@
             if (Notification.permission === "granted") {
                 setTimeout(checkAccountsForNotification, 3000);
             }
+            checkUrlWidgetShortcuts();
         });
+
+        // Verifica se o app foi aberto através de um Widget/Atalho da tela inicial do telemóvel
+        function checkUrlWidgetShortcuts() {
+            const params = new URLSearchParams(window.location.search);
+            const action = params.get('action');
+            if (action === 'despesa') {
+                setTimeout(() => openModalWithType('Despesa'), 250);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (action === 'receita' || action === 'ganho') {
+                setTimeout(() => openModalWithType('Receita'), 250);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
         // --------------------------------------
 
         function renderAvatarGrid(containerId, inputId, selectedVal) {
@@ -620,7 +668,7 @@
                 transactions = [];
                 vaults = [];
                 wallet = { name: "Carteira", balance: 0 };
-                homeConfig = { order: ['netBalance', 'pendenciasCard', 'categorySummary', 'transactionsPreview', 'chartsPreview', 'vaultPreview'], visibility: { netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false } };
+                homeConfig = { order: ['quickActionsWidget', 'netBalance', 'pendenciasCard', 'categorySummary', 'transactionsPreview', 'chartsPreview', 'vaultPreview'], visibility: { quickActionsWidget: true, netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false } };
                 
                 showFirstTimeSetup();
             }
@@ -629,6 +677,7 @@
         function openCardsConfigModal() {
             const listContainer = document.getElementById('configToggleList'); listContainer.innerHTML = '';
             const titles = { 
+                quickActionsWidget: 'Widget: Ações Rápidas (+ Despesa / + Ganho)',
                 netBalance: 'Balanço Mensal', 
                 pendenciasCard: 'Resumo de Pendências',
                 categorySummary: 'Despesas por Categoria',
@@ -637,7 +686,7 @@
                 vaultPreview: 'Cofre & Rendimento'
             };
             if(!homeConfig.order) homeConfig.order = Object.keys(titles);
-            if(!homeConfig.visibility) homeConfig.visibility = { netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false };
+            if(!homeConfig.visibility) homeConfig.visibility = { quickActionsWidget: true, netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: false, chartsPreview: false, vaultPreview: false };
             
             Object.keys(titles).forEach(k => { if(homeConfig.visibility[k] === undefined) homeConfig.visibility[k] = false; if(!homeConfig.order.includes(k)) homeConfig.order.push(k); });
 
@@ -649,7 +698,7 @@
         }
         function closeCardsConfigModal() { document.getElementById('cardsConfigModal').classList.remove('active'); }
         function saveHomeConfig() { 
-            const titles = { netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: true, chartsPreview: true, vaultPreview: true };
+            const titles = { quickActionsWidget: true, netBalance: true, pendenciasCard: true, categorySummary: true, transactionsPreview: true, chartsPreview: true, vaultPreview: true };
             Object.keys(titles).forEach(key => { const el = document.getElementById(`tgl_${key}`); if(el) homeConfig.visibility[key] = el.checked; }); 
             saveToStorage(); updateUI(); 
         }
@@ -755,6 +804,60 @@
         function onMonthSelectChange() { selectedMonthKey = document.getElementById('monthYearSelect').value; updateUI(); }
         function changeMonth(direction) { const months = getAvailableMonths(); let idx = months.indexOf(selectedMonthKey); if(idx !== -1) { let targetIdx = idx + direction; if(targetIdx >= 0 && targetIdx < months.length) { selectedMonthKey = months[targetIdx]; initMonthSelector(); } } }
         function setTxFilter(filter, btn) { currentTxFilter = filter; document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); btn.classList.add('active'); updateUI(); }
+
+        // Abre o Modal já configurado para Despesa ou Receita (usado pelos Widgets)
+        function openModalWithType(type) {
+            openModal();
+            setTxType(type);
+        }
+
+        // Lançamento Expresso direto pelo Widget da Tela Inicial
+        function toggleExpressForm() {
+            const box = document.getElementById('expressFormBox');
+            if(box) box.classList.toggle('active');
+        }
+
+        function submitExpressTx(type) {
+            const descEl = document.getElementById('expressDesc');
+            const amtEl = document.getElementById('expressAmount');
+            const catEl = document.getElementById('expressCat');
+
+            const desc = descEl.value.trim();
+            const amount = parseFloat(amtEl.value);
+            let category = catEl.value;
+
+            if (!desc || isNaN(amount) || amount <= 0) {
+                alert("Preencha a descrição e um valor válido!");
+                return;
+            }
+
+            // Garante que a categoria corresponde ao tipo ou escolhe a primeira padrão do tipo
+            const catObj = categories.find(c => c.name === category && c.type === type);
+            if (!catObj) {
+                const defaultCat = categories.find(c => c.type === type);
+                category = defaultCat ? defaultCat.name : (type === 'Receita' ? 'Salário' : 'Compras');
+            }
+
+            const todayStr = new Date().toISOString().substring(0, 10);
+            const groupId = Date.now();
+
+            transactions.push({
+                id: groupId,
+                groupId,
+                date: todayStr,
+                type: type,
+                category: category,
+                desc: desc,
+                amount: amount,
+                status: 'Pago',
+                paymentMethod: type === 'Despesa' ? 'Dinheiro/Débito/PIX' : 'N/A',
+                obs: 'Lançamento Rápido (Widget)'
+            });
+
+            selectedMonthKey = todayStr.substring(0, 7);
+            saveToStorage();
+            initMonthSelector();
+        }
 
         function openModal(editId = null) {
             if(categories.length === 0) { alert("Por favor, cadastre uma categoria primeiro!"); switchView('categories', document.querySelectorAll('.nav-bar .nav-item')[0], 'Categorias'); return; }
@@ -870,6 +973,40 @@
             });
 
             const elementMakers = {
+                quickActionsWidget: () => {
+                    const d = document.createElement('div');
+                    d.className = 'quick-widget-card';
+                    let catOptions = categories.map(c => `<option value="${c.name}">${c.icon || '📌'} ${c.name} (${c.type})</option>`).join('');
+                    d.innerHTML = `
+                        <div class="drag-handle-hint"><i class="fa-solid fa-grip-lines"></i></div>
+                        <div class="quick-widget-title"><i class="fa-solid fa-bolt" style="color:var(--warning);"></i> Inclusão Rápida</div>
+                        <div class="quick-widget-grid">
+                            <button type="button" class="quick-action-btn expense" onclick="openModalWithType('Despesa')">
+                                <div class="quick-action-icon"><i class="fa-solid fa-minus"></i></div>
+                                <div class="quick-action-text">Despesa<span>Novo gasto</span></div>
+                            </button>
+                            <button type="button" class="quick-action-btn income" onclick="openModalWithType('Receita')">
+                                <div class="quick-action-icon"><i class="fa-solid fa-plus"></i></div>
+                                <div class="quick-action-text">Ganho<span>Nova receita</span></div>
+                            </button>
+                        </div>
+                        <button type="button" class="express-toggle-btn" onclick="toggleExpressForm()">
+                            <i class="fa-solid fa-keyboard"></i> Lançamento Expresso (1 Toque)
+                        </button>
+                        <div class="express-form-box" id="expressFormBox">
+                            <div class="express-row">
+                                <input type="text" id="expressDesc" class="express-input" placeholder="Descrição (ex: Almoço)">
+                                <input type="number" step="0.01" id="expressAmount" class="express-input" placeholder="Valor R$">
+                            </div>
+                            <div class="express-row-bottom">
+                                <select id="expressCat" class="express-input">${catOptions}</select>
+                                <button type="button" class="express-submit-btn exp" onclick="submitExpressTx('Despesa')" title="Lançar como Despesa"><i class="fa-solid fa-arrow-down"></i> Gasto</button>
+                                <button type="button" class="express-submit-btn inc" onclick="submitExpressTx('Receita')" title="Lançar como Ganho"><i class="fa-solid fa-arrow-up"></i> Ganho</button>
+                            </div>
+                        </div>
+                    `;
+                    return d;
+                },
                 netBalance: () => { const d = document.createElement('div'); d.className = 'balance-card'; d.innerHTML = `<div class="drag-handle-hint"><i class="fa-solid fa-grip-lines"></i></div><div class="balance-title">O que Sobrou no Mês</div><div class="balance-amount">${formatCurrency(totalIncome - totalExpense)}</div><div class="balance-row"><div class="mini-stat income">Receitas <span>${formatCurrency(totalIncome)}</span></div><div class="mini-stat expense">Despesas <span>${formatCurrency(totalExpense)}</span></div></div>`; return d; },
                 pendenciasCard: () => {
                     const d = document.createElement('div'); d.className = 'pendencias-card'; d.style.position = 'relative';
