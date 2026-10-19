@@ -49,6 +49,14 @@
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
 
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        
+        /* Ajuste de segurança para o topo do iPhone (Notch / Ilha Dinâmica) sem afetar o Android */
+        @supports (-webkit-touch-callout: default) {
+            header {
+                padding-top: calc(20px + env(safe-area-inset-top)) !important;
+            }
+        }
+
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%; }
         .header-top-left { display: flex; align-items: center; gap: 12px; }
         .header-top h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
@@ -83,7 +91,6 @@
         .mini-stat.income span { color: var(--success); }
         .mini-stat.expense span { color: var(--danger); }
 
-        /* Estilo do Card de Pendências Inspirado no Print */
         .pendencias-card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); width: 100%; }
         .pendencias-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
         .pendencias-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
@@ -99,7 +106,6 @@
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 16px; border: 1px solid var(--border); }
         .chart-container { position: relative; height: 260px; width: 100%; }
 
-        /* Estilos para arrastar elementos na home */
         #homeContainer { display: flex; flex-direction: column; gap: 16px; }
         .home-card-wrapper { cursor: grab; position: relative; }
         .home-card-wrapper:active { cursor: grabbing; }
@@ -308,7 +314,6 @@
             <button class="menu-option" onclick="closeMenuModal(); switchView('categories', null, 'Categorias')"><i class="fa-solid fa-tags" style="color: #F87171;"></i> Categorias & Metas</button>
             <button class="menu-option" onclick="closeMenuModal(); openCalcModal()"><i class="fa-solid fa-calculator" style="color: #10B981;"></i> Calculadora</button>
             <button class="menu-option" onclick="closeMenuModal(); openReportModal()"><i class="fa-solid fa-file-invoice-dollar" style="color: #3B82F6;"></i> Relatório Mensal</button>
-            <!-- BOTÃO DE ATIVAR NOTIFICAÇÕES -->
             <button class="menu-option" onclick="closeMenuModal(); requestNotificationPermission()"><i class="fa-solid fa-bell" style="color: #F59E0B;"></i> Ativar Notificações de Vencimento</button>
             <button class="menu-option" onclick="closeMenuModal(); exportBackup()"><i class="fa-solid fa-download" style="color: #8B5CF6;"></i> Exportar Backup (JSON)</button>
             <button class="menu-option" onclick="closeMenuModal(); document.getElementById('importFile').click()"><i class="fa-solid fa-upload" style="color: #EC4899;"></i> Carregar Backup (JSON)</button>
@@ -494,10 +499,10 @@
             initApp(); 
         }
 
-        // --- SISTEMA DE NOTIFICAÇÕES NATIVAS NO ANDROID ---
+        // --- SISTEMA DE NOTIFICAÇÕES NATIVAS ---
         function requestNotificationPermission() {
             if (!("Notification" in window)) {
-                alert("Este navegador no celular não suporta notificações.");
+                alert("Este navegador não suporta notificações.");
                 return;
             }
             
@@ -542,7 +547,7 @@
                 setTimeout(checkAccountsForNotification, 3000);
             }
         });
-        // ------------------------------------------------
+        // --------------------------------------
 
         function renderAvatarGrid(containerId, inputId, selectedVal) {
             const container = document.getElementById(containerId); container.innerHTML = '';
