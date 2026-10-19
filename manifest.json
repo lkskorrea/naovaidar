@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0F0F0F",
-  "theme_color": "#0F0F0F",
+  "theme_color": "#1E3A8A",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2454/2454282.png",
@@ -20,34 +20,6 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Nova Despesa",
-      "short_name": "- Despesa",
-      "description": "Incluir uma nova despesa rapidamente",
-      "url": "./index.html?action=despesa",
-      "icons": [
-        {
-          "src": "https://cdn-icons-png.flaticon.com/192/1828/1828843.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Novo Ganho",
-      "short_name": "+ Ganho",
-      "description": "Incluir uma nova receita rapidamente",
-      "url": "./index.html?action=receita",
-      "icons": [
-        {
-          "src": "https://cdn-icons-png.flaticon.com/192/1828/1828817.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
     }
   ]
 }
