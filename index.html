@@ -49,25 +49,11 @@
             --border: #CBD5E1;
         }
 
-        /* --- NOVO TEMA ROXO/VIOLETA --- */
-        [data-color="purple"] {
-            /* MODO ESCURO (ROXO) Mantém o mesmo fundo escuro */
-            --primary-accent: #8B5CF6; 
-            --header-bg: linear-gradient(135deg, #4C1D95, #2E1065);
-        }
-
-        [data-theme="light"][data-color="purple"] {
-            /* MODO CLARO (ROXO) */
-            --primary-accent: #7C3AED; 
-            --header-bg: linear-gradient(135deg, #A78BFA, #7C3AED);
-        }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 110px; overflow-x: hidden; }
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(var(--calendar-invert, 1)); }
         [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); }
 
-        /* HIERARQUIA DE Z-INDEX UNIFICADA E CORRIGIDA */
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); position: relative; z-index: 1000; }
         .account-badge { position: relative; z-index: 1001; }
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; padding: 14px 0 18px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; border-top: 1px solid var(--border); }
@@ -246,17 +232,6 @@
         .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
 
-        .category-summary-item { display: flex; flex-direction: column; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        .category-summary-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .empty-state { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
-        .action-icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 4px; }
-        
-        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 6px; }
-        .icon-option { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 1.1rem; text-align: center; cursor: pointer; color: var(--text-muted); }
-        .icon-option.selected { border-color: var(--primary-accent); background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; font-weight: 600; cursor: default; background: var(--bg); border-radius: 8px; margin-bottom: 8px; padding-left: 12px; padding-right: 12px; }
-
         .custom-select-trigger { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--text); outline: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
         .custom-select-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .custom-select-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-weight: 600; color: var(--text); }
@@ -280,7 +255,7 @@
         }
     </style>
 </head>
-<body data-theme="dark" data-color="blue">
+<body data-theme="dark">
 
     <div id="authScreen" style="display: none;">
         <div class="auth-card" id="authCardContent">
@@ -297,7 +272,6 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="header-btn" onclick="toggleColorTheme()" title="Mudar Cor Principal"><i class="fa-solid fa-palette"></i></button>
                 <label class="theme-switch" title="Alternar Tema">
                     <input type="checkbox" id="themeToggleCheckbox" onchange="toggleThemeSwitch(this)">
                     <span class="slider">
@@ -739,38 +713,53 @@
         </div>
     </div>
 
-    <div class="modal" id="deleteModal" onclick="checkModalClose(event, 'deleteModal')">
-        <div class="modal-content">
-            <div class="modal-handle-bar" onclick="closeDeleteModal()"></div>
-            <div class="modal-header"><h3>Excluir</h3><button class="close-btn-minimal" onclick="closeDeleteModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;" id="deleteModalText">Esta é uma despesa recorrente/parcelada. Como deseja excluir?</p>
-            <input type="hidden" id="deleteTxId"><input type="hidden" id="deleteTxGroupId">
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="btn-primary" style="background: var(--danger); border: none;" onclick="confirmDelete(1)">Excluir apenas este mês</button>
-                <button class="btn-primary" style="background: var(--border); color: var(--text);" onclick="confirmDelete(2)">Excluir este e os futuros</button>
-                <button class="btn-primary" style="background: transparent; color: var(--text-muted);" onclick="closeDeleteModal()">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
+        // === SISTEMA DE EFEITOS SONOROS (UI CLICK) ===
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function playClickSound() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.04);
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.04);
+        }
+
+        document.addEventListener('click', (e) => {
+            const isClickable = e.target.closest('button, .menu-option, .nav-item, .avatar-option, .icon-option, .custom-select-item, .filter-chip, .custom-date-day, .action-icon-btn, .header-btn, .account-badge, .month-selector, .wallet-banner, .type-btn, .custom-select-trigger');
+            if (isClickable) {
+                playClickSound();
+            }
+        });
+
+        // === UTILITÁRIOS DA INTERFACE ===
         function checkModalClose(event, modalId) { if (event.target.id === modalId) document.getElementById(modalId).classList.remove('active'); }
 
-        // === FUNÇÕES DE ALERTA E CONFIRMAÇÃO VISUAL ===
         let confirmCallbackFn = null;
-
         function showConfirm(title, message, callback) {
             document.getElementById('confirmTitle').textContent = title;
             document.getElementById('confirmMessage').innerHTML = message;
             confirmCallbackFn = callback;
             document.getElementById('customConfirmModal').classList.add('active');
         }
-
         function closeCustomConfirm() {
             document.getElementById('customConfirmModal').classList.remove('active');
             confirmCallbackFn = null;
         }
-
         document.getElementById('confirmActionBtn').addEventListener('click', () => {
             if(confirmCallbackFn) confirmCallbackFn();
             closeCustomConfirm();
@@ -781,12 +770,11 @@
             document.getElementById('alertMessage').innerHTML = message;
             document.getElementById('customAlertModal').classList.add('active');
         }
-
         function closeCustomAlert() {
             document.getElementById('customAlertModal').classList.remove('active');
         }
 
-        // === CONFIGURAÇÃO FIREBASE ===
+        // === CONFIGURAÇÃO FIREBASE E VARIÁVEIS GLOBAIS ===
         const firebaseConfig = {
             apiKey: "AIzaSyD95syW4nmNEkoTzhlDcdnOahkQQ0_ZgjY",
             authDomain: "dashboard-financeiro-572a4.firebaseapp.com",
@@ -800,19 +788,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // === VARIÁVEIS GLOBAIS ===
-        let userData = null;
-        let categories = [];
-        let financialGoals = [];
-        let creditCards = [];
-        let transactions = [];
-        let vaults = [];
-        let wallet = { name: "Carteira", balance: 0 };
-        let homeConfig = { 
-            order: ['netBalance', 'pendenciasCard', 'creditCardsPreview', 'goalsPreview', 'categorySummary', 'vaultPreview'], 
-            visibility: { netBalance: true, pendenciasCard: true, creditCardsPreview: true, goalsPreview: true, categorySummary: true, vaultPreview: true } 
-        };
-        
         const defaultCategories = [ 
             { name: "Moradia", type: "Despesa", icon: "fa-solid fa-house", budget: 0 }, 
             { name: "Alimentação", type: "Despesa", icon: "fa-solid fa-cart-shopping", budget: 0 }, 
@@ -827,15 +802,29 @@
             { name: "Outros Ganhos", type: "Receita", icon: "fa-solid fa-hand-holding-dollar", budget: 0 }
         ];
 
-        let selectedMonthKey = "", currentType = 'Despesa', currentTxFilter = 'all', isPrivacyMode = false;
+        let userData = null;
+        let categories = [...defaultCategories];
+        let financialGoals = [];
+        let creditCards = [];
+        let transactions = [];
+        let vaults = [];
+        let wallet = { name: "Carteira", balance: 0 };
+        let homeConfig = { 
+            order: ['netBalance', 'pendenciasCard', 'creditCardsPreview', 'goalsPreview', 'categorySummary', 'vaultPreview'], 
+            visibility: { netBalance: true, pendenciasCard: true, creditCardsPreview: true, goalsPreview: true, categorySummary: true, vaultPreview: true } 
+        };
+        
+        let selectedMonthKey = "";
+        let currentType = 'Despesa';
+        let currentTxFilter = 'all';
+        let isPrivacyMode = false;
         let currentChartFilter = 'Despesa';
-        let myChart = null, calcExpression = "0";
+        let myChart = null;
+        let calcExpression = "0";
         let currentCalendarDate = new Date();
         let stagedCalendarDate = null; 
         let currentCalendarTarget = 'tx';
-        
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
-        let currentColor = localStorage.getItem('naovaidar_color') || 'blue';
 
         // === MONITOR DE ESTADO DA CONTA (FIREBASE) ===
         auth.onAuthStateChanged(async (user) => {
@@ -852,7 +841,7 @@
             }
         });
 
-        // === TELAS DE LOGIN E REGISTO ===
+        // === TELAS DE LOGIN E REGISTO COM AVISOS VISUAIS ===
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
@@ -920,7 +909,6 @@
                 await auth.signInWithEmailAndPassword(email, pass);
             } catch(error) {
                 let errorMsg = "Ocorreu um erro ao entrar.";
-                
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     errorMsg = "E-mail ou senha incorretos.";
                 } else if (error.code === 'auth/invalid-email') {
@@ -928,7 +916,6 @@
                 } else if (error.code === 'auth/too-many-requests') {
                     errorMsg = "Muitas tentativas falhadas. Tente novamente mais tarde.";
                 }
-
                 errorContainer.innerHTML = `
                     <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -936,10 +923,8 @@
                             <span>${errorMsg}</span>
                         </div>
                         <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showRegisterForm()">Criar uma Conta Nova</button>
-                    </div>
-                `;
+                    </div>`;
                 errorContainer.style.display = 'block';
-
                 btn.innerHTML = 'Entrar'; 
                 btn.disabled = false;
             }
@@ -967,7 +952,6 @@
                 });
             } catch(error) {
                 let errorMsg = "Erro ao criar conta.";
-                
                 if (error.code === 'auth/email-already-in-use') {
                     errorMsg = "Este e-mail já está em uso.";
                 } else if (error.code === 'auth/weak-password') {
@@ -975,7 +959,6 @@
                 } else if (error.code === 'auth/invalid-email') {
                     errorMsg = "O formato do e-mail é inválido.";
                 }
-
                 if(errorContainer) {
                     errorContainer.innerHTML = `
                         <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
@@ -984,11 +967,9 @@
                                 <span>${errorMsg}</span>
                             </div>
                             <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showLoginForm()">Ir para Login</button>
-                        </div>
-                    `;
+                        </div>`;
                     errorContainer.style.display = 'block';
                 }
-
                 btn.innerHTML = 'Criar e Entrar'; 
                 btn.disabled = false;
             }
@@ -1064,19 +1045,7 @@
             });
         }
 
-        // === FUNÇÕES DA INTERFACE DO APP ===
-        function applyColor(color) {
-            currentColor = color;
-            document.body.setAttribute('data-color', color);
-            localStorage.setItem('naovaidar_color', color);
-            if(myChart) { myChart.update(); }
-        }
-
-        function toggleColorTheme() {
-            const newColor = currentColor === 'blue' ? 'purple' : 'blue';
-            applyColor(newColor);
-        }
-
+        // === FUNÇÕES GERAIS E INICIALIZAÇÃO ===
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.setAttribute('data-theme', theme);
@@ -1112,7 +1081,6 @@
 
         function initApp() {
             applyTheme(currentTheme);
-            applyColor(currentColor);
             setSelectedDate(new Date().toISOString().substring(0, 10));
             updateAccountLabels(); 
             selectedMonthKey = new Date().toISOString().substring(0, 7);
@@ -1120,6 +1088,7 @@
             checkAndSendNotifications();
         }
 
+        // === FUNÇÕES DE CARTÕES ===
         function selectCcColor(color, btn) {
             document.getElementById('ccColorInput').value = color;
             document.querySelectorAll('#ccColorGrid .icon-option').forEach(el => {
@@ -1197,6 +1166,7 @@
             });
         }
 
+        // === UTILITÁRIOS DA INTERFACE ===
         function togglePrivacy() { isPrivacyMode = !isPrivacyMode; document.getElementById('privacyIcon').className = isPrivacyMode ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'; updateUI(); }
         function openMenuModal() { document.getElementById('menuModal').classList.add('active'); }
         function closeMenuModal() { document.getElementById('menuModal').classList.remove('active'); }
@@ -1382,6 +1352,8 @@
         function openCategoryModal(oldName=null) { document.getElementById('categoryModal').classList.add('active'); if(oldName) { const c = categories.find(x => x.name === oldName); if(c) { document.getElementById('catOldName').value = c.name; document.getElementById('catName').value = c.name; document.getElementById('catType').value = c.type; document.getElementById('catIconInput').value = c.icon || 'fa-solid fa-tag'; document.getElementById('catBudget').value = c.budget || ''; } } else { document.getElementById('categoryForm').reset(); document.getElementById('catOldName').value = ''; document.getElementById('catIconInput').value = 'fa-solid fa-tag'; } }
         function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('active'); }
         function selectCatIcon(iconClass) { document.getElementById('catIconInput').value = iconClass; document.querySelectorAll('#catIconGrid .icon-option').forEach(el => el.classList.remove('selected')); if(event && event.currentTarget) event.currentTarget.classList.add('selected'); }
+        
+        // Correção das Categorias
         function handleCategoryFormSubmit(e) { 
             e.preventDefault(); 
             const oldName = document.getElementById('catOldName').value; 
@@ -1918,6 +1890,7 @@
             if(document.getElementById('view-charts').classList.contains('active')) updateChart();
         }
 
+        // --- FUNÇÕES DE EXCLUSÃO ---
         function promptDelete(id) { 
             const tx = transactions.find(t => t.id === id); 
             if(!tx) return; 
