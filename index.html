@@ -11,8 +11,6 @@
     <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Biblioteca do Scanner de QR Code -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -23,6 +21,7 @@
             --danger: #EF4444; 
             --warning: #F59E0B; 
             --primary-accent: #3B82F6;
+            --ai-accent: #8B5CF6;
             --bg: #0B1120; 
             --card-bg: #172136; 
             --header-bg: linear-gradient(135deg, #1E3A8A, #0F172A);
@@ -38,6 +37,7 @@
             --danger: #DC2626; 
             --warning: #D97706; 
             --primary-accent: #2563EB;
+            --ai-accent: #7C3AED;
             --bg: #F0F9FF; 
             --card-bg: #FFFFFF; 
             --header-bg: linear-gradient(135deg, #60A5FA, #2563EB);
@@ -223,7 +223,8 @@
         .type-btn { flex: 1; padding: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 10px; font-weight: 600; cursor: pointer; }
         .type-btn.active.receita { background: var(--success); color: white; border-color: var(--success); }
         .type-btn.active.despesa { background: var(--danger); color: white; border-color: var(--danger); }
-        .btn-primary { width: 100%; padding: 14px; background: var(--primary-accent); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-primary { width: 100%; padding: 14px; background: var(--primary-accent); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; transition: opacity 0.2s; }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
 
         .category-summary-item { display: flex; flex-direction: column; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
@@ -254,11 +255,6 @@
         .custom-date-day:hover { border-color: var(--primary-accent); background: rgba(59, 130, 246, 0.1); }
         .custom-date-day.selected { background: var(--primary-accent); color: white; border-color: var(--primary-accent); }
         .custom-date-day.muted { opacity: 0.3; }
-
-        /* Ajuste pro leitor de QR Code não ficar feio no modo escuro */
-        #qr-reader { background: var(--card-bg) !important; color: var(--text) !important; border: none !important; }
-        #qr-reader__dashboard_section_csr button { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--primary-accent); background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); cursor: pointer; font-weight: 600; margin-bottom: 10px; }
-        #qr-reader__dashboard_section_swaplink { color: var(--primary-accent) !important; text-decoration: none; margin-top: 10px; display: inline-block;}
 
         @media print {
             body * { visibility: hidden; }
@@ -520,6 +516,11 @@
                     <input type="text" class="form-control" id="profileNameInput" required>
                 </div>
                 <div class="form-group">
+                    <label>Chave da API Gemini (IA para Câmera)</label>
+                    <input type="password" class="form-control" id="profileApiKeyInput" placeholder="Sua chave do Google AI Studio...">
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Pode obter uma chave gratuita em aistudio.google.com</p>
+                </div>
+                <div class="form-group">
                     <label>Avatar</label>
                     <div class="avatar-grid" id="profileAvatarGrid">
                         <div class="avatar-option selected" onclick="selectProfileAvatar('🦁', this)">🦁</div>
@@ -616,7 +617,6 @@
                 <div class="custom-date-header">Dom</div><div class="custom-date-header">Seg</div><div class="custom-date-header">Ter</div><div class="custom-date-header">Qua</div><div class="custom-date-header">Qui</div><div class="custom-date-header">Sex</div><div class="custom-date-header">Sáb</div>
             </div>
             <div class="custom-date-grid" id="calendarDaysGrid"></div>
-            <!-- Botão modificado para maior visibilidade -->
             <button class="btn-primary" style="margin-top: 14px; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--primary-accent); color: var(--primary-accent); font-weight: 700;" onclick="selectTodayDate()">Ir para Hoje</button>
         </div>
     </div>
@@ -633,10 +633,11 @@
                     <button type="button" class="type-btn receita" id="btnReceita" onclick="setTxType('Receita')">Receita</button>
                 </div>
                 
-                <button type="button" class="btn-primary" style="margin-top: 0; margin-bottom: 16px; background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); border: 1px dashed var(--primary-accent);" onclick="toggleQRScanner()" id="qrToggleBtn">
-                    <i class="fa-solid fa-qrcode"></i> Escanear Nota Fiscal (QR Code)
+                <!-- BOTÃO E INPUT DA CÂMERA COM IA -->
+                <button type="button" class="btn-primary" style="margin-top: 0; margin-bottom: 16px; background: rgba(139, 92, 246, 0.1); color: var(--ai-accent); border: 1px dashed var(--ai-accent);" onclick="document.getElementById('aiCameraInput').click()" id="aiReceiptBtn">
+                    <i class="fa-solid fa-camera-retro"></i> <span>Escanear Recibo (Câmera com IA)</span>
                 </button>
-                <div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; display: none; margin-bottom: 16px; border: 1px solid var(--border);"></div>
+                <input type="file" accept="image/*" capture="environment" id="aiCameraInput" style="display: none;" onchange="handleAiReceipt(event)">
 
                 <div class="form-group">
                     <label>Data</label>
@@ -690,7 +691,7 @@
                     </div>
                     <input type="hidden" id="txStatus" value="Pago">
                 </div>
-                <div class="form-group"><label>Observações</label><input type="text" class="form-control" id="txObs" placeholder="Link da nota fiscal, notas extras..."></div>
+                <div class="form-group"><label>Observações</label><input type="text" class="form-control" id="txObs"></div>
                 <button type="submit" class="btn-primary" id="txSubmitBtn">Salvar Lançamento</button>
             </form>
         </div>
@@ -784,9 +785,6 @@
         let stagedCalendarDate = null; 
         let currentCalendarTarget = 'tx';
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
-
-        // Variável do Scanner
-        let html5QrcodeScanner = null;
 
         function applyTheme(theme) {
             currentTheme = theme;
@@ -1163,47 +1161,82 @@
 
         function checkModalClose(event, modalId) { if (event.target.id === modalId) document.getElementById(modalId).classList.remove('active'); }
         
-        // --- FUNÇÕES DA CÂMARA (QR CODE SEFAZ) ---
-        function toggleQRScanner() {
-            const readerDiv = document.getElementById('qr-reader');
-            const btn = document.getElementById('qrToggleBtn');
-            
-            if (readerDiv.style.display === 'none' || readerDiv.style.display === '') {
-                readerDiv.style.display = 'block';
-                btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Fechar Câmera';
-                
-                if (!html5QrcodeScanner) {
-                    html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        // --- FUNÇÕES DA CÂMARA COM IA GEMINI ---
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function handleAiReceipt(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            let apiKey = localStorage.getItem('naovaidar_gemini_key_v98');
+            if (!apiKey) {
+                apiKey = prompt("Para utilizar a leitura com IA, por favor introduza a sua chave da API Gemini (Google AI Studio):");
+                if (!apiKey || apiKey.trim() === '') {
+                    alert("A chave da API é necessária para utilizar esta funcionalidade.");
+                    event.target.value = '';
+                    return;
                 }
-            } else {
-                closeQRScanner();
+                localStorage.setItem('naovaidar_gemini_key_v98', apiKey.trim());
             }
-        }
 
-        function closeQRScanner() {
-            const readerDiv = document.getElementById('qr-reader');
-            const btn = document.getElementById('qrToggleBtn');
-            if(readerDiv) readerDiv.style.display = 'none';
-            if(btn) btn.innerHTML = '<i class="fa-solid fa-qrcode"></i> Escanear Nota Fiscal (QR Code)';
-            
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(error => { console.error("Falha ao fechar o scanner.", error); });
-                html5QrcodeScanner = null;
+            const btn = document.getElementById('aiReceiptBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>A Analisar Recibo...</span>';
+            btn.disabled = true;
+
+            try {
+                const base64Image = await fileToBase64(file);
+                const base64Data = base64Image.split(',')[1]; 
+
+                const requestBody = {
+                    contents: [{
+                        parts: [
+                            { text: "Analise este recibo ou nota fiscal e extraia estritamente em formato JSON: {'estabelecimento': 'Nome do local', 'data': 'YYYY-MM-DD', 'valor': numérico}. Se não conseguir encontrar alguma destas informações, deixe o valor vazio ou null. Não responda com markdown (```json), apenas o texto JSON puro para ser parseado." },
+                            { inline_data: { mime_type: file.type, data: base64Data } }
+                        ]
+                    }]
+                };
+
+                const response = await fetch(`[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    if(response.status === 400 || response.status === 403) {
+                         localStorage.removeItem('naovaidar_gemini_key_v98');
+                         throw new Error("A sua chave da API é inválida ou expirou. Tente novamente para inserir uma nova.");
+                    }
+                    throw new Error(`Erro na comunicação com a API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                let textResult = data.candidates[0].content.parts[0].text;
+                
+                textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const receiptInfo = JSON.parse(textResult);
+
+                if (receiptInfo.estabelecimento) document.getElementById('txDesc').value = receiptInfo.estabelecimento;
+                if (receiptInfo.data) setSelectedDate(receiptInfo.data);
+                if (receiptInfo.valor) document.getElementById('txAmount').value = receiptInfo.valor;
+
+                alert("Recibo analisado com sucesso! Confirme as informações preenchidas.");
+            } catch (error) {
+                console.error(error);
+                alert("Ocorreu um erro ao processar a imagem: " + error.message);
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                event.target.value = ''; 
             }
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            closeQRScanner();
-            document.getElementById('txObs').value = decodedText;
-            if(!document.getElementById('txDesc').value) {
-                document.getElementById('txDesc').value = "Nota Fiscal Escaneada";
-            }
-            alert("QR Code lido com sucesso! O link da nota foi adicionado nas observações.");
-        }
-
-        function onScanFailure(error) {
-            // Ignorar falhas durante o escaneamento ativo (acontecem a cada frame até encontrar o código)
         }
 
         function openModal(editId = null) {
@@ -1234,7 +1267,6 @@
         }
         function closeModal() { 
             document.getElementById('txModal').classList.remove('active'); 
-            closeQRScanner();
         }
         
         function setTxType(type) {
@@ -1870,6 +1902,7 @@
                 document.getElementById('profileNameInput').value = userData.name || '';
                 const currentAvatar = userData.avatar || '🦁';
                 document.getElementById('profileAvatarInput').value = currentAvatar;
+                document.getElementById('profileApiKeyInput').value = localStorage.getItem('naovaidar_gemini_key_v98') || '';
                 
                 document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => {
                     el.classList.remove('selected');
@@ -1894,11 +1927,19 @@
             e.preventDefault();
             const newName = document.getElementById('profileNameInput').value.trim();
             const newAvatar = document.getElementById('profileAvatarInput').value;
+            const newApiKey = document.getElementById('profileApiKeyInput').value.trim();
             
             if (newName) {
                 if (!userData) userData = {};
                 userData.name = newName;
                 userData.avatar = newAvatar;
+                
+                if (newApiKey) {
+                    localStorage.setItem('naovaidar_gemini_key_v98', newApiKey);
+                } else {
+                    localStorage.removeItem('naovaidar_gemini_key_v98');
+                }
+
                 saveToStorage();
                 updateAccountLabels();
                 closeProfileModal();
@@ -1908,7 +1949,6 @@
         function deleteAndCreateNewProfile() {
             if (confirm("Tem certeza que deseja excluir o perfil? TODOS os seus dados, lançamentos, cofres, cartões e metas serão permanentemente apagados.")) {
                 
-                // Reseta variáveis para os padrões
                 userData = null;
                 categories = [ 
                     { name: "Moradia", type: "Despesa", icon: "fa-solid fa-house", budget: 0 }, 
@@ -1929,7 +1969,6 @@
                 vaults = [];
                 wallet = { name: "Carteira", balance: 0 };
                 
-                // Limpa o armazenamento local de fato
                 localStorage.removeItem('naovaidar_user_v98');
                 localStorage.removeItem('naovaidar_cats_v98');
                 localStorage.removeItem('naovaidar_txs_v98');
@@ -1938,6 +1977,7 @@
                 localStorage.removeItem('naovaidar_homecfg_v98');
                 localStorage.removeItem('naovaidar_goals_v98');
                 localStorage.removeItem('naovaidar_cc_v98');
+                localStorage.removeItem('naovaidar_gemini_key_v98');
                 
                 closeProfileModal();
                 showFirstTimeSetup();
