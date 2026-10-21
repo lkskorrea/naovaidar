@@ -520,19 +520,22 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeMenuModal()"></div>
             <div class="modal-header"><h3>Menu Principal</h3><button class="close-btn-minimal" onclick="closeMenuModal()">✕</button></div>
+            
+            <button class="menu-option" onclick="closeMenuModal(); openProfileModal()"><i class="fa-solid fa-user" style="color: var(--primary-accent);"></i> <span>Meu Perfil</span></button>
             <button class="menu-option" onclick="closeMenuModal(); switchView('categories', null)"><i class="fa-solid fa-tags" style="color: #F87171;"></i> <span>Categorias</span></button>
             <button class="menu-option" onclick="closeMenuModal(); switchView('goals', null)"><i class="fa-solid fa-bullseye" style="color: #EC4899;"></i> <span>Metas de Economia</span></button>
             <button class="menu-option" onclick="closeMenuModal(); switchView('vault', null)"><i class="fa-solid fa-vault" style="color: #FBBF24;"></i> <span>Cofre & Rendimento</span></button>
             <button class="menu-option" onclick="closeMenuModal(); openCalcModal()"><i class="fa-solid fa-calculator" style="color: #10B981;"></i> <span>Calculadora</span></button>
             <button class="menu-option" onclick="closeMenuModal(); openReportModal()"><i class="fa-solid fa-file-invoice-dollar" style="color: #3B82F6;"></i> <span>Relatório Mensal</span></button>
-            <button class="menu-option" onclick="closeMenuModal(); openWipeModal()"><i class="fa-solid fa-trash-can" style="color: var(--danger);"></i> <span style="color: var(--danger);">Apagar Todos os Lançamentos</span></button>
+            
+            <button class="menu-option" onclick="closeMenuModal(); openWipeModal()"><i class="fa-solid fa-rotate-right" style="color: var(--danger);"></i> <span style="color: var(--danger);">Redefinir Aplicativo</span></button>
         </div>
     </div>
 
     <div class="modal" id="profileModal" onclick="checkModalClose(event, 'profileModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeProfileModal()"></div>
-            <div class="modal-header"><h3>Configurações de Perfil</h3><button class="close-btn-minimal" onclick="closeProfileModal()">✕</button></div>
+            <div class="modal-header"><h3>Meu Perfil</h3><button class="close-btn-minimal" onclick="closeProfileModal()">✕</button></div>
             <form onsubmit="handleProfileFormSubmit(event)">
                 <div class="form-group">
                     <label>Nome do Utilizador</label>
@@ -554,7 +557,7 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                     <button type="submit" class="btn-primary">Salvar / Atualizar</button>
-                    <button type="button" class="btn-primary" style="background: var(--danger); border: none;" onclick="logoutUser()">Sair da Conta (Logout)</button>
+                    <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta (Logout)</button>
                 </div>
             </form>
         </div>
@@ -569,17 +572,17 @@
         </div>
     </div>
 
-    <!-- MODAL APAGAR TUDO -->
+    <!-- MODAL REDEFINIR TUDO -->
     <div class="modal" id="wipeModal" onclick="checkModalClose(event, 'wipeModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeWipeModal()"></div>
-            <div class="modal-header"><h3>Excluir Tudo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação irá apagar <strong>TODOS</strong> os seus lançamentos financeiros (Receitas e Despesas). As suas categorias, cofres e cartões serão mantidos. <br><br>Para confirmar, digite a sua senha atual:</p>
+            <div class="modal-header"><h3>Redefinir Aplicativo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação irá apagar <strong>TODOS</strong> os seus dados (lançamentos, cartões, cofres e metas) e restaurar as categorias padrão. A sua conta continuará ativa.<br><br>Para confirmar, digite a sua senha atual:</p>
             <form onsubmit="handleWipeAll(event)">
                 <div class="form-group">
                     <input type="password" class="form-control" id="wipePassword" required placeholder="Sua senha da conta...">
                 </div>
-                <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnWipeAll">Confirmar Exclusão</button>
+                <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnWipeAll">Confirmar Redefinição</button>
             </form>
         </div>
     </div>
@@ -592,7 +595,8 @@
             <div id="reportModalContent"></div>
             
             <div style="display: flex; gap: 10px; margin-top: 20px;" id="reportActionButtons">
-                <button class="btn-primary" style="flex: 1; background: var(--danger); border: none;" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Imprimir/PDF</button>
+                <button class="btn-primary" style="flex: 1; background: var(--danger); border: none;" onclick="exportReportPDF()"><i class="fa-solid fa-file-pdf"></i> Imprimir/PDF</button>
+                <button class="btn-primary" style="flex: 1; background: var(--success); border: none;" onclick="exportReportCSV()"><i class="fa-solid fa-file-excel"></i> Excel</button>
             </div>
         </div>
     </div>
@@ -1978,16 +1982,23 @@
                 const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
                 await user.reauthenticateWithCredential(credential);
                 
+                // Zera os dados financeiros e mantém o userData para o login continuar ativo
                 transactions = []; 
+                creditCards = [];
+                financialGoals = [];
+                vaults = [];
+                wallet = { name: "Carteira", balance: 0 };
+                categories = [...defaultCategories];
+
                 saveToStorage();
                 updateUI();
                 closeWipeModal();
-                showAlert("Sucesso", "Todos os lançamentos foram excluídos com sucesso!");
+                showAlert("Sucesso", "O aplicativo foi redefinido com sucesso!");
             } catch (error) {
                 console.error(error);
                 showAlert("Erro", "A senha está incorreta ou ocorreu um erro na validação.");
             } finally {
-                btn.innerHTML = 'Confirmar Exclusão';
+                btn.innerHTML = 'Confirmar Redefinição';
                 btn.disabled = false;
             }
         }
