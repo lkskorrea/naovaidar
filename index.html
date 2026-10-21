@@ -765,11 +765,12 @@
             }
         });
 
-        // === TELAS DE LOGIN E REGISTO ===
+        // === TELAS DE LOGIN E REGISTO COM AVISOS VISUAIS ===
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Acesse o seu Dashboard na Nuvem</p>
+                <div id="loginErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleLogin(event)">
                     <div class="form-group" style="text-align: left;">
                         <label>E-mail</label>
@@ -787,6 +788,7 @@
         function showRegisterForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Criar Conta</h2>
+                <div id="regErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleRegister(event)">
                     <div class="form-group" style="text-align: left;"><label>Nome</label><input type="text" class="form-control" id="regName" required></div>
                     <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="regEmail" required></div>
@@ -821,12 +823,38 @@
             const btn = document.getElementById('btnLoginBtn');
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            const errorContainer = document.getElementById('loginErrorContainer');
+            
+            errorContainer.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
+            
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
             } catch(error) {
-                alert("Erro ao entrar: " + error.message);
-                btn.innerHTML = 'Entrar'; btn.disabled = false;
+                let errorMsg = "Ocorreu um erro ao entrar.";
+                
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMsg = "E-mail ou senha incorretos.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = "O formato do e-mail é inválido.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMsg = "Muitas tentativas falhadas. Tente novamente mais tarde.";
+                }
+
+                errorContainer.innerHTML = `
+                    <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>${errorMsg}</span>
+                        </div>
+                        <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showRegisterForm()">Criar uma Conta Nova</button>
+                    </div>
+                `;
+                errorContainer.style.display = 'block';
+
+                btn.innerHTML = 'Entrar'; 
+                btn.disabled = false;
             }
         }
 
@@ -837,19 +865,45 @@
             const email = document.getElementById('regEmail').value;
             const pass = document.getElementById('regPass').value;
             const avatar = document.getElementById('setupAvatarInput').value;
+            const errorContainer = document.getElementById('regErrorContainer');
             
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            if(errorContainer) errorContainer.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
+            
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                // Criar o documento inicial no Firestore para o novo usuário
                 userData = { name, avatar };
                 categories = [...defaultCategories];
                 await db.collection('users').doc(userCredential.user.uid).set({
                     userData, categories, transactions: [], financialGoals: [], creditCards: [], vaults: [], wallet: {name: "Carteira", balance: 0}, homeConfig
                 });
             } catch(error) {
-                alert("Erro ao registar: " + error.message);
-                btn.innerHTML = 'Criar e Entrar'; btn.disabled = false;
+                let errorMsg = "Erro ao criar conta.";
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = "Este e-mail já está em uso.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = "A senha deve ter pelo menos 6 caracteres.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = "O formato do e-mail é inválido.";
+                }
+
+                if(errorContainer) {
+                    errorContainer.innerHTML = `
+                        <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>${errorMsg}</span>
+                            </div>
+                            <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showLoginForm()">Ir para Login</button>
+                        </div>
+                    `;
+                    errorContainer.style.display = 'block';
+                }
+
+                btn.innerHTML = 'Criar e Entrar'; 
+                btn.disabled = false;
             }
         }
 
@@ -880,7 +934,6 @@
 
         function saveToStorage() { 
             if (!auth.currentUser) return;
-            // Salvar no Firebase em background
             const dataToSave = { userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig };
             db.collection('users').doc(auth.currentUser.uid).set(dataToSave).catch(err => {
                 console.error("Erro a salvar:", err);
@@ -1226,7 +1279,9 @@
                 setSelectedDate(new Date().toISOString().substring(0, 10)); selectStatus('Pago'); selectFrequency('unico'); selectPaymentMethod('Dinheiro / Débito / PIX'); toggleFrequencyFields(); setTxType('Despesa');
             }
         }
-        function closeModal() { document.getElementById('txModal').classList.remove('active'); }
+        function closeModal() { 
+            document.getElementById('txModal').classList.remove('active'); 
+        }
         
         function setTxType(type) {
             currentType = type; const btnD = document.getElementById('btnDespesa'), btnR = document.getElementById('btnReceita'), pmGroup = document.getElementById('paymentMethodGroup');
@@ -1852,61 +1907,6 @@
         }
 
         function closeCardsConfigModal() { document.getElementById('cardsConfigModal').classList.remove('active'); }
-
-        // === FUNÇÕES DO PERFIL ===
-        function openProfileModal() {
-            document.getElementById('profileModal').classList.add('active');
-            
-            if (userData) {
-                document.getElementById('profileNameInput').value = userData.name || '';
-                const currentAvatar = userData.avatar || '🦁';
-                document.getElementById('profileAvatarInput').value = currentAvatar;
-                
-                document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => {
-                    el.classList.remove('selected');
-                    if (el.textContent.trim() === currentAvatar) {
-                        el.classList.add('selected');
-                    }
-                });
-            }
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('active');
-        }
-
-        function selectProfileAvatar(avatar, btn) {
-            document.getElementById('profileAvatarInput').value = avatar;
-            document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => el.classList.remove('selected'));
-            if (btn) btn.classList.add('selected');
-        }
-
-        function handleProfileFormSubmit(e) {
-            e.preventDefault();
-            const newName = document.getElementById('profileNameInput').value.trim();
-            const newAvatar = document.getElementById('profileAvatarInput').value;
-            
-            if (newName) {
-                if (!userData) userData = {};
-                userData.name = newName;
-                userData.avatar = newAvatar;
-                
-                saveToStorage();
-                updateAccountLabels();
-                closeProfileModal();
-            }
-        }
-
-        function logoutUser() {
-            if (confirm("Tem certeza que deseja sair da conta?")) {
-                auth.signOut().then(() => {
-                    window.location.reload();
-                }).catch(err => {
-                    alert("Erro ao fazer logout: " + err.message);
-                });
-            }
-        }
-
     </script>
 </body>
 </html>
