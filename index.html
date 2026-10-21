@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="manifest.json">
 
-    <!-- Firebase SDKs (Versão Compatível com HTML puro) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
@@ -54,10 +54,10 @@
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(var(--calendar-invert, 1)); }
         [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); }
 
-        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; flex-direction: column; }
+        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; flex-direction: column; }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
 
-        header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); position: relative; z-index: 1000; }
         
         @supports (-webkit-touch-callout: default) {
             header { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
@@ -68,7 +68,7 @@
         
         .header-actions { display: flex; gap: 12px; align-items: center; }
         
-        .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; position: relative; z-index: 1001; }
         
         .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; flex-shrink: 0; }
         .header-btn.menu-large { width: 38px; height: 38px; font-size: 1.1rem; }
@@ -206,10 +206,6 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: flex-end; backdrop-filter: blur(4px); }
         .modal.active { display: flex; }
-        
-        #txModal, #vaultModal, #goalModal, #ccModal { z-index: 2000; }
-        #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2500; }
-        #calendarPickerModal { z-index: 2600; }
 
         .modal-content { background: var(--card-bg); width: 100%; max-height: 90vh; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; overflow-y: auto; animation: slideUp 0.3s ease-out; color: var(--text); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -316,7 +312,6 @@
     <div class="container">
         <div id="view-dashboard" class="view-section active">
             <div id="alertsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px;"></div>
-            
             <div id="homeContainer"></div>
             <button class="add-card-btn" onclick="openCardsConfigModal()">
                 <i class="fa-solid fa-arrows-up-down"></i> <span>Editar posição dos blocos</span>
@@ -503,6 +498,7 @@
             <button class="menu-option" onclick="closeMenuModal(); switchView('vault', null)"><i class="fa-solid fa-vault" style="color: #FBBF24;"></i> <span>Cofre & Rendimento</span></button>
             <button class="menu-option" onclick="closeMenuModal(); openCalcModal()"><i class="fa-solid fa-calculator" style="color: #10B981;"></i> <span>Calculadora</span></button>
             <button class="menu-option" onclick="closeMenuModal(); openReportModal()"><i class="fa-solid fa-file-invoice-dollar" style="color: #3B82F6;"></i> <span>Relatório Mensal</span></button>
+            <button class="menu-option" onclick="closeMenuModal(); openWipeModal()"><i class="fa-solid fa-trash-can" style="color: var(--danger);"></i> <span style="color: var(--danger);">Apagar Todos os Lançamentos</span></button>
         </div>
     </div>
 
@@ -546,6 +542,22 @@
         </div>
     </div>
 
+    <!-- MODAL APAGAR TUDO -->
+    <div class="modal" id="wipeModal" onclick="checkModalClose(event, 'wipeModal')">
+        <div class="modal-content">
+            <div class="modal-handle-bar" onclick="closeWipeModal()"></div>
+            <div class="modal-header"><h3>Excluir Tudo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação irá apagar <strong>TODOS</strong> os seus lançamentos financeiros (Receitas e Despesas). As suas categorias, cofres e cartões serão mantidos. <br><br>Para confirmar, digite a sua senha atual:</p>
+            <form onsubmit="handleWipeAll(event)">
+                <div class="form-group">
+                    <input type="password" class="form-control" id="wipePassword" required placeholder="Sua senha da conta...">
+                </div>
+                <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnWipeAll">Confirmar Exclusão</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE RELATÓRIO -->
     <div class="modal" id="reportModal" onclick="checkModalClose(event, 'reportModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeReportModal()"></div>
@@ -765,7 +777,7 @@
             }
         });
 
-        // === TELAS DE LOGIN E REGISTO COM AVISOS VISUAIS ===
+        // === TELAS DE LOGIN E REGISTO ===
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
@@ -940,7 +952,138 @@
             });
         }
 
-        // === FUNÇÕES DA INTERFACE DO APP ===
+        // === FUNÇÕES DO PERFIL ===
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+            
+            if (userData) {
+                document.getElementById('profileNameInput').value = userData.name || '';
+                const currentAvatar = userData.avatar || '🦁';
+                document.getElementById('profileAvatarInput').value = currentAvatar;
+                
+                document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => {
+                    el.classList.remove('selected');
+                    if (el.textContent.trim() === currentAvatar) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        function selectProfileAvatar(avatar, btn) {
+            document.getElementById('profileAvatarInput').value = avatar;
+            document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => el.classList.remove('selected'));
+            if (btn) btn.classList.add('selected');
+        }
+
+        function handleProfileFormSubmit(e) {
+            e.preventDefault();
+            const newName = document.getElementById('profileNameInput').value.trim();
+            const newAvatar = document.getElementById('profileAvatarInput').value;
+            
+            if (newName) {
+                if (!userData) userData = {};
+                userData.name = newName;
+                userData.avatar = newAvatar;
+                
+                saveToStorage();
+                updateAccountLabels();
+                closeProfileModal();
+            }
+        }
+
+        function logoutUser() {
+            if (confirm("Tem certeza que deseja sair da conta?")) {
+                auth.signOut().then(() => {
+                    window.location.reload();
+                }).catch(err => {
+                    alert("Erro ao fazer logout: " + err.message);
+                });
+            }
+        }
+
+        // === EXCLUIR TODOS OS LANÇAMENTOS (WIPE) ===
+        function openWipeModal() {
+            document.getElementById('wipePassword').value = '';
+            document.getElementById('wipeModal').classList.add('active');
+        }
+
+        function closeWipeModal() {
+            document.getElementById('wipeModal').classList.remove('active');
+        }
+
+        async function handleWipeAll(e) {
+            e.preventDefault();
+            const pass = document.getElementById('wipePassword').value;
+            const btn = document.getElementById('btnWipeAll');
+            const user = auth.currentUser;
+            
+            if(!user) return;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            try {
+                // Tenta reautenticar o utilizador na nuvem com a senha digitada
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+                await user.reauthenticateWithCredential(credential);
+                
+                // Se a senha estiver correta, apaga as transações
+                transactions = []; 
+                saveToStorage();
+                updateUI();
+                closeWipeModal();
+                alert("Todos os lançamentos foram excluídos com sucesso!");
+            } catch (error) {
+                console.error(error);
+                alert("A senha está incorreta ou ocorreu um erro na validação.");
+            } finally {
+                btn.innerHTML = 'Confirmar Exclusão';
+                btn.disabled = false;
+            }
+        }
+
+        // === FUNÇÕES DO RELATÓRIO ===
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+            renderReport();
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        function renderReport() {
+            const container = document.getElementById('reportModalContent');
+            let filteredTxs = transactions.filter(t => t.date && t.date.startsWith(selectedMonthKey));
+            
+            if(filteredTxs.length === 0) {
+                container.innerHTML = '<div class="empty-state">Sem lançamentos para este mês.</div>';
+                return;
+            }
+            
+            let html = '<div class="report-table-wrapper"><table class="report-table"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>';
+            
+            // Ordenar por data
+            filteredTxs.sort((a,b) => a.date.localeCompare(b.date)).forEach(t => {
+                const color = t.type === 'Receita' ? 'var(--success)' : 'var(--text)';
+                const sign = t.type === 'Receita' ? '+' : '-';
+                html += `<tr>
+                    <td style="white-space:nowrap">${formatDate(t.date)}</td>
+                    <td><strong>${t.desc}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${t.status}</span></td>
+                    <td>${t.category}</td>
+                    <td style="color:${color}; font-weight:bold; white-space:nowrap; text-align:right;">${sign} ${formatCurrency(t.amount)}</td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // === RESTANTE DAS FUNÇÕES DA INTERFACE ===
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.setAttribute('data-theme', theme);
