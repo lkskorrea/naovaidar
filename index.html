@@ -54,22 +54,33 @@
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(var(--calendar-invert, 1)); }
         [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); }
 
-        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; flex-direction: column; }
-        .auth-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-
+        /* HIERARQUIA DE Z-INDEX UNIFICADA E CORRIGIDA */
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); position: relative; z-index: 1000; }
+        .account-badge { position: relative; z-index: 1001; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; padding: 14px 0 18px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; border-top: 1px solid var(--border); }
         
+        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; flex-direction: column; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: flex-end; backdrop-filter: blur(4px); z-index: 2000; }
+        .modal.active { display: flex; }
+        
+        #menuModal, #profileModal, #cardsConfigModal, #reportModal { z-index: 2000 !important; }
+        #txModal, #vaultModal, #goalModal, #ccModal { z-index: 2100 !important; }
+        #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2600 !important; }
+        #calendarPickerModal { z-index: 2700 !important; }
+        #deleteModal, #wipeModal, #walletModal, #calcModal { z-index: 2800 !important; }
+        #customConfirmModal, #customAlertModal { z-index: 4500 !important; align-items: center !important; }
+
         @supports (-webkit-touch-callout: default) {
             header { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
         }
 
+        .auth-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%; }
         .header-top-left { display: flex; align-items: center; gap: 10px; }
-        
         .header-actions { display: flex; gap: 12px; align-items: center; }
         
-        .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; position: relative; z-index: 1001; }
-        
+        .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; flex-shrink: 0; }
         .header-btn.menu-large { width: 38px; height: 38px; font-size: 1.1rem; }
 
@@ -191,7 +202,6 @@
         .calc-btn.eq { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); }
         .calc-btn.clr { background: var(--danger); color: #fff; border-color: var(--danger); }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; padding: 14px 0 18px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; border-top: 1px solid var(--border); }
         .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.75rem; gap: 4px; cursor: pointer; font-weight: 600; padding: 2px; width: 65px; overflow: hidden; }
         .nav-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 0.75rem; }
         .nav-item i { font-size: 1.4rem; transition: transform 0.2s; }
@@ -203,18 +213,6 @@
         
         .menu-option { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 10px; width: 100%; text-align: left; }
         .menu-option i { font-size: 1.2rem; width: 24px; text-align: center; }
-
-        /* HIERARQUIA DE Z-INDEX FORÇADA PARA CORRIGIR BUGS DE SOBREPOSIÇÃO */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: flex-end; backdrop-filter: blur(4px); }
-        .modal.active { display: flex; }
-        
-        #menuModal, #profileModal, #cardsConfigModal, #reportModal { z-index: 2000 !important; }
-        #txModal, #vaultModal, #goalModal, #ccModal { z-index: 2100 !important; }
-        #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2600 !important; }
-        #calendarPickerModal { z-index: 2700 !important; }
-        #deleteModal, #wipeModal, #walletModal, #calcModal { z-index: 2800 !important; }
-        
-        #customConfirmModal, #customAlertModal { z-index: 3000 !important; align-items: center !important; }
 
         .modal-content { background: var(--card-bg); width: 100%; max-height: 90vh; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; overflow-y: auto; animation: slideUp 0.3s ease-out; color: var(--text); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -277,7 +275,9 @@
 <body data-theme="dark">
 
     <div id="authScreen" style="display: none;">
-        <div class="auth-card" id="authCardContent"></div>
+        <div class="auth-card" id="authCardContent">
+            <!-- Conteúdo injetado pelo JavaScript -->
+        </div>
     </div>
 
     <header>
@@ -554,7 +554,7 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                     <button type="submit" class="btn-primary">Salvar / Atualizar</button>
-                    <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta (Logout)</button>
+                    <button type="button" class="btn-primary" style="background: var(--danger); border: none;" onclick="logoutUser()">Sair da Conta (Logout)</button>
                 </div>
             </form>
         </div>
@@ -574,7 +574,7 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeWipeModal()"></div>
             <div class="modal-header"><h3>Excluir Tudo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação irá apagar <strong>TODOS</strong> os seus lançamentos financeiros. As suas categorias, cofres e cartões serão mantidos. <br><br>Para confirmar, digite a sua senha atual:</p>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação irá apagar <strong>TODOS</strong> os seus lançamentos financeiros (Receitas e Despesas). As suas categorias, cofres e cartões serão mantidos. <br><br>Para confirmar, digite a sua senha atual:</p>
             <form onsubmit="handleWipeAll(event)">
                 <div class="form-group">
                     <input type="password" class="form-control" id="wipePassword" required placeholder="Sua senha da conta...">
@@ -739,6 +739,8 @@
     </div>
 
     <script>
+        function checkModalClose(event, modalId) { if (event.target.id === modalId) document.getElementById(modalId).classList.remove('active'); }
+
         // === FUNÇÕES DE ALERTA E CONFIRMAÇÃO VISUAL ===
         let confirmCallbackFn = null;
 
@@ -901,6 +903,7 @@
                 await auth.signInWithEmailAndPassword(email, pass);
             } catch(error) {
                 let errorMsg = "Ocorreu um erro ao entrar.";
+                
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     errorMsg = "E-mail ou senha incorretos.";
                 } else if (error.code === 'auth/invalid-email') {
@@ -908,12 +911,18 @@
                 } else if (error.code === 'auth/too-many-requests') {
                     errorMsg = "Muitas tentativas falhadas. Tente novamente mais tarde.";
                 }
+
                 errorContainer.innerHTML = `
                     <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-circle-exclamation"></i><span>${errorMsg}</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>${errorMsg}</span>
+                        </div>
                         <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showRegisterForm()">Criar uma Conta Nova</button>
-                    </div>`;
+                    </div>
+                `;
                 errorContainer.style.display = 'block';
+
                 btn.innerHTML = 'Entrar'; 
                 btn.disabled = false;
             }
@@ -941,18 +950,28 @@
                 });
             } catch(error) {
                 let errorMsg = "Erro ao criar conta.";
-                if (error.code === 'auth/email-already-in-use') { errorMsg = "Este e-mail já está em uso."; } 
-                else if (error.code === 'auth/weak-password') { errorMsg = "A senha deve ter pelo menos 6 caracteres."; } 
-                else if (error.code === 'auth/invalid-email') { errorMsg = "O formato do e-mail é inválido."; }
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = "Este e-mail já está em uso.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = "A senha deve ter pelo menos 6 caracteres.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = "O formato do e-mail é inválido.";
+                }
 
                 if(errorContainer) {
                     errorContainer.innerHTML = `
                         <div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); text-align: left; flex-direction: column; align-items: flex-start; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-circle-exclamation"></i><span>${errorMsg}</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>${errorMsg}</span>
+                            </div>
                             <button type="button" class="btn-sm" style="background: var(--danger); color: white; margin-top: 5px; width: 100%; font-size: 0.9rem;" onclick="showLoginForm()">Ir para Login</button>
-                        </div>`;
+                        </div>
+                    `;
                     errorContainer.style.display = 'block';
                 }
+
                 btn.innerHTML = 'Criar e Entrar'; 
                 btn.disabled = false;
             }
@@ -991,41 +1010,6 @@
             });
         }
 
-        // === FUNÇÕES DA INTERFACE DO APP ===
-        function applyTheme(theme) {
-            currentTheme = theme;
-            document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('naovaidar_theme', theme);
-            
-            const themeCheckbox = document.getElementById('themeToggleCheckbox');
-            const metaTheme = document.getElementById('metaThemeColor');
-            
-            if(theme === 'light') {
-                if(themeCheckbox) themeCheckbox.checked = true;
-                if(metaTheme) metaTheme.setAttribute('content', '#F0F9FF');
-                Chart.defaults.color = '#0F172A';
-            } else {
-                if(themeCheckbox) themeCheckbox.checked = false;
-                if(metaTheme) metaTheme.setAttribute('content', '#0B1120');
-                Chart.defaults.color = '#9CA3AF';
-            }
-            if(myChart) { myChart.update(); }
-        }
-
-        function toggleThemeSwitch(checkbox) {
-            if(checkbox.checked) { applyTheme('light'); } 
-            else { applyTheme('dark'); }
-        }
-
-        function initApp() {
-            applyTheme(currentTheme);
-            setSelectedDate(new Date().toISOString().substring(0, 10));
-            updateAccountLabels(); 
-            selectedMonthKey = new Date().toISOString().substring(0, 7);
-            initMonthSelector();
-            checkAndSendNotifications();
-        }
-
         // === NOTIFICAÇÕES NATIVAS ===
         function checkAndSendNotifications() {
             if (!("Notification" in window)) return;
@@ -1061,6 +1045,49 @@
                     }
                 }
             });
+        }
+
+        // === FUNÇÕES DA INTERFACE DO APP ===
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('naovaidar_theme', theme);
+            
+            const themeCheckbox = document.getElementById('themeToggleCheckbox');
+            const metaTheme = document.getElementById('metaThemeColor');
+            
+            if(theme === 'light') {
+                if(themeCheckbox) themeCheckbox.checked = true;
+                if(metaTheme) metaTheme.setAttribute('content', '#F0F9FF');
+                Chart.defaults.color = '#0F172A';
+            } else {
+                if(themeCheckbox) themeCheckbox.checked = false;
+                if(metaTheme) metaTheme.setAttribute('content', '#0B1120');
+                Chart.defaults.color = '#9CA3AF';
+            }
+            if(myChart) { myChart.update(); }
+        }
+
+        function toggleThemeSwitch(checkbox) {
+            if(checkbox.checked) { applyTheme('light'); } 
+            else { applyTheme('dark'); }
+        }
+
+        function getCategoryColor(catName) {
+            const CATEGORY_COLORS = { "Moradia": "#3B82F6", "Alimentação": "#10B981", "Transporte": "#F59E0B", "Saúde": "#EF4444", "Compras": "#14B8A6", "Entretenimento": "#6366F1", "Educação": "#8B5CF6", "Lazer": "#EC4899", "Contas": "#F59E0B", "Empréstimo": "#F97316", "Salário": "#10B981", "Outros Ganhos": "#3B82F6" };
+            if (CATEGORY_COLORS[catName]) return CATEGORY_COLORS[catName];
+            let hash = 0; for (let i = 0; i < catName.length; i++) hash = catName.charCodeAt(i) + ((hash << 5) - hash);
+            let color = '#'; for (let i = 0; i < 3; i++) { let value = (hash >> (i * 8)) & 0xFF; color += ('00' + value.toString(16)).substr(-2); }
+            return color;
+        }
+
+        function initApp() {
+            applyTheme(currentTheme);
+            setSelectedDate(new Date().toISOString().substring(0, 10));
+            updateAccountLabels(); 
+            selectedMonthKey = new Date().toISOString().substring(0, 7);
+            initMonthSelector();
+            checkAndSendNotifications();
         }
 
         function selectCcColor(color, btn) {
@@ -1341,8 +1368,6 @@
                 }
             } 
         }
-
-        function checkModalClose(event, modalId) { if (event.target.id === modalId) document.getElementById(modalId).classList.remove('active'); }
 
         function openModal(editId = null) {
             if(categories.length === 0) { showAlert("Aviso", "Cadastre uma categoria primeiro!"); return; }
@@ -1849,7 +1874,7 @@
                 document.getElementById('deleteTxGroupId').value = tx.groupId; 
                 document.getElementById('deleteModal').classList.add('active'); 
             } else { 
-                showConfirm("Excluir", "Deseja excluir este lançamento?", () => {
+                showConfirm("Excluir Lançamento", "Deseja excluir este lançamento?", () => {
                     transactions = transactions.filter(t => t.id !== id); saveToStorage(); updateUI(); 
                 });
             } 
@@ -1858,7 +1883,7 @@
         function confirmDelete(mode) { const id = parseInt(document.getElementById('deleteTxId').value, 10), groupId = parseInt(document.getElementById('deleteTxGroupId').value, 10), targetTx = transactions.find(t => t.id === id); if(mode === 1) transactions = transactions.filter(t => t.id !== id); else if(mode === 2 && targetTx) transactions = transactions.filter(t => !(t.groupId === groupId && t.date >= targetTx.date)); closeDeleteModal(); saveToStorage(); updateUI(); }
         
         function deleteVault(id) {
-            showConfirm("Excluir", "Excluir este cofre?", () => {
+            showConfirm("Excluir Cofre", "Excluir este cofre?", () => {
                 vaults = vaults.filter(v => v.id !== id); saveToStorage(); updateUI();
             });
         }
@@ -1926,6 +1951,80 @@
                     } 
                 }); 
             }
+        }
+
+        // === EXCLUIR TODOS OS LANÇAMENTOS (WIPE) ===
+        function openWipeModal() {
+            document.getElementById('wipePassword').value = '';
+            document.getElementById('wipeModal').classList.add('active');
+        }
+
+        function closeWipeModal() {
+            document.getElementById('wipeModal').classList.remove('active');
+        }
+
+        async function handleWipeAll(e) {
+            e.preventDefault();
+            const pass = document.getElementById('wipePassword').value;
+            const btn = document.getElementById('btnWipeAll');
+            const user = auth.currentUser;
+            
+            if(!user) return;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            try {
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+                await user.reauthenticateWithCredential(credential);
+                
+                transactions = []; 
+                saveToStorage();
+                updateUI();
+                closeWipeModal();
+                showAlert("Sucesso", "Todos os lançamentos foram excluídos com sucesso!");
+            } catch (error) {
+                console.error(error);
+                showAlert("Erro", "A senha está incorreta ou ocorreu um erro na validação.");
+            } finally {
+                btn.innerHTML = 'Confirmar Exclusão';
+                btn.disabled = false;
+            }
+        }
+
+        // === FUNÇÕES DO RELATÓRIO ===
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+            renderReport();
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        function renderReport() {
+            const container = document.getElementById('reportModalContent');
+            let filteredTxs = transactions.filter(t => t.date && t.date.startsWith(selectedMonthKey));
+            
+            if(filteredTxs.length === 0) {
+                container.innerHTML = '<div class="empty-state">Sem lançamentos para este mês.</div>';
+                return;
+            }
+            
+            let html = '<div class="report-table-wrapper"><table class="report-table"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>';
+            
+            filteredTxs.sort((a,b) => a.date.localeCompare(b.date)).forEach(t => {
+                const color = t.type === 'Receita' ? 'var(--success)' : 'var(--text)';
+                const sign = t.type === 'Receita' ? '+' : '-';
+                html += `<tr>
+                    <td style="white-space:nowrap">${formatDate(t.date)}</td>
+                    <td><strong>${t.desc}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${t.status}</span></td>
+                    <td>${t.category}</td>
+                    <td style="color:${color}; font-weight:bold; white-space:nowrap; text-align:right;">${sign} ${formatCurrency(t.amount)}</td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
         }
 
         function exportReportPDF() {
