@@ -273,7 +273,7 @@
 
     <div id="authScreen" style="display: none;">
         <div class="auth-card" id="authCardContent">
-            <!-- Conteúdo injetado pelo JavaScript (Login/Registo ou Carregamento) -->
+            <!-- Conteúdo injetado pelo JavaScript -->
         </div>
     </div>
 
@@ -282,7 +282,7 @@
             <div class="header-top-left">
                 <button class="header-btn menu-large" onclick="openMenuModal()" title="Menu Principal"><i class="fa-solid fa-bars"></i></button>
                 <div class="account-badge" id="currentAccountLabel" onclick="openProfileModal()" title="Gerir Perfil">
-                    <span id="userAvatarDisplay">🦁</span> <span id="userNameDisplay">Utilizador</span>
+                    <span id="userAvatarDisplay">🦁</span> <span id="userNameDisplay">Carregando...</span>
                 </div>
             </div>
             <div class="header-actions">
@@ -315,7 +315,6 @@
 
     <div class="container">
         <div id="view-dashboard" class="view-section active">
-            <!-- Painel de Notificações Apenas na Home -->
             <div id="alertsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px;"></div>
             
             <div id="homeContainer"></div>
@@ -374,7 +373,6 @@
             <div class="section-title"><span>Cofre & Rendimento</span><button class="btn-sm btn-primary" style="margin-top:0; width:auto; padding: 6px 14px;" onclick="openVaultModal()"><i class="fa-solid fa-plus"></i> Novo</button></div>
             <div class="card"><div class="item-list" id="vaultListContainer"></div></div>
         </div>
-
     </div>
 
     <!-- Menu Fixo Inferior -->
@@ -533,7 +531,7 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                     <button type="submit" class="btn-primary">Salvar / Atualizar</button>
-                    <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta (Logout)</button>
+                    <button type="button" class="btn-primary" style="background: var(--danger); border: none;" onclick="logoutUser()">Sair da Conta (Logout)</button>
                 </div>
             </form>
         </div>
@@ -855,10 +853,6 @@
             }
         }
 
-        function logoutUser() {
-            auth.signOut().then(() => window.location.reload());
-        }
-
         // === CARREGAR E SALVAR NA NUVEM ===
         async function loadUserData(uid) {
             try {
@@ -874,14 +868,13 @@
                     wallet = data.wallet || { name: "Carteira", balance: 0 };
                     if(data.homeConfig) homeConfig = data.homeConfig;
                 } else {
-                    // Documento não existe (segurança para contas antigas que não foram gravadas)
                     userData = { name: "Utilizador", avatar: "🦁" };
                     categories = [...defaultCategories];
                     await saveToStorage();
                 }
             } catch(e) {
                 console.error("Erro ao carregar dados:", e);
-                alert("Ocorreu um erro ao comunicar com a nuvem.");
+                alert("Ocorreu um erro ao comunicar com a nuvem. Atualize a página.");
             }
         }
 
@@ -898,7 +891,7 @@
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('naovaidar_theme', theme); // Tema continua local
+            localStorage.setItem('naovaidar_theme', theme);
             
             const themeCheckbox = document.getElementById('themeToggleCheckbox');
             const metaTheme = document.getElementById('metaThemeColor');
@@ -920,8 +913,8 @@
             else { applyTheme('dark'); }
         }
 
-        const CATEGORY_COLORS = { "Moradia": "#3B82F6", "Alimentação": "#10B981", "Transporte": "#F59E0B", "Saúde": "#EF4444", "Compras": "#14B8A6", "Entretenimento": "#6366F1", "Educação": "#8B5CF6", "Lazer": "#EC4899", "Contas": "#F59E0B", "Empréstimo": "#F97316", "Salário": "#10B981", "Outros Ganhos": "#3B82F6" };
         function getCategoryColor(catName) {
+            const CATEGORY_COLORS = { "Moradia": "#3B82F6", "Alimentação": "#10B981", "Transporte": "#F59E0B", "Saúde": "#EF4444", "Compras": "#14B8A6", "Entretenimento": "#6366F1", "Educação": "#8B5CF6", "Lazer": "#EC4899", "Contas": "#F59E0B", "Empréstimo": "#F97316", "Salário": "#10B981", "Outros Ganhos": "#3B82F6" };
             if (CATEGORY_COLORS[catName]) return CATEGORY_COLORS[catName];
             let hash = 0; for (let i = 0; i < catName.length; i++) hash = catName.charCodeAt(i) + ((hash << 5) - hash);
             let color = '#'; for (let i = 0; i < 3; i++) { let value = (hash >> (i * 8)) & 0xFF; color += ('00' + value.toString(16)).substr(-2); }
@@ -983,7 +976,9 @@
                 });
             }
         }
+
         function closeCCModal() { document.getElementById('ccModal').classList.remove('active'); }
+
         function handleCCFormSubmit(e) {
             e.preventDefault();
             const id = document.getElementById('ccId').value;
@@ -1003,6 +998,7 @@
             closeCCModal();
             updateUI();
         }
+
         function deleteCC(id) {
             if(confirm("Deseja excluir este cartão?")) {
                 creditCards = creditCards.filter(c => c.id !== id);
@@ -1032,7 +1028,6 @@
         function handleGoalFormSubmit(e) { e.preventDefault(); const id = document.getElementById('goalId').value, name = document.getElementById('goalName').value, target = parseFloat(document.getElementById('goalTarget').value)||0, current = parseFloat(document.getElementById('goalCurrent').value)||0, icon = document.getElementById('goalIconInput').value; if(id) { const g = financialGoals.find(x=>x.id==id); if(g){g.name=name; g.target=target; g.current=current; g.icon=icon;} } else { financialGoals.push({id:Date.now(), name, target, current, icon}); } saveToStorage(); closeGoalModal(); updateUI(); }
         function deleteGoal(id) { if(confirm("Deseja excluir esta meta?")) { financialGoals = financialGoals.filter(g => g.id !== id); saveToStorage(); updateUI(); } }
 
-        // --- FUNÇÕES DA CARTEIRA ---
         function openWalletModal() {
             document.getElementById('walletModal').classList.add('active');
             const b = wallet.balance || 0;
@@ -1052,7 +1047,6 @@
             updateUI();
         }
 
-        // --- FUNÇÕES DE COFRES ---
         function openVaultModal(id = null) {
             document.getElementById('vaultModal').classList.add('active');
             if(id) {
@@ -1232,9 +1226,7 @@
                 setSelectedDate(new Date().toISOString().substring(0, 10)); selectStatus('Pago'); selectFrequency('unico'); selectPaymentMethod('Dinheiro / Débito / PIX'); toggleFrequencyFields(); setTxType('Despesa');
             }
         }
-        function closeModal() { 
-            document.getElementById('txModal').classList.remove('active'); 
-        }
+        function closeModal() { document.getElementById('txModal').classList.remove('active'); }
         
         function setTxType(type) {
             currentType = type; const btnD = document.getElementById('btnDespesa'), btnR = document.getElementById('btnReceita'), pmGroup = document.getElementById('paymentMethodGroup');
@@ -1727,7 +1719,6 @@
         function calcEquals() { try { const sanitized = calcExpression.replace(/[^0-9+\-*/.]/g, ''); if (!sanitized || ['+', '-', '*', '/'].includes(sanitized.slice(-1))) throw new Error('Inválido'); const result = eval(sanitized.replace('÷', '/').replace('×', '*')); if (isNaN(result) || !isFinite(result)) throw new Error('Inválido'); calcExpression = String(Math.round(result * 100) / 100); document.getElementById('calcDisplay').textContent = calcExpression; } catch(e) { document.getElementById('calcDisplay').textContent = "Erro"; calcExpression = "0"; } }
         function useCalcResult() { let res = document.getElementById('calcDisplay').textContent; if(!isNaN(res)) { document.getElementById('txAmount').value = res; closeCalcModal(); } }
         
-        // --- FUNÇÕES DE GRÁFICO ATUALIZADAS ---
         function setChartFilter(type, btn) {
             currentChartFilter = type;
             document.querySelectorAll('#view-charts .filter-chip').forEach(c => c.classList.remove('active'));
@@ -1861,6 +1852,61 @@
         }
 
         function closeCardsConfigModal() { document.getElementById('cardsConfigModal').classList.remove('active'); }
+
+        // === FUNÇÕES DO PERFIL ===
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+            
+            if (userData) {
+                document.getElementById('profileNameInput').value = userData.name || '';
+                const currentAvatar = userData.avatar || '🦁';
+                document.getElementById('profileAvatarInput').value = currentAvatar;
+                
+                document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => {
+                    el.classList.remove('selected');
+                    if (el.textContent.trim() === currentAvatar) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        function selectProfileAvatar(avatar, btn) {
+            document.getElementById('profileAvatarInput').value = avatar;
+            document.querySelectorAll('#profileAvatarGrid .avatar-option').forEach(el => el.classList.remove('selected'));
+            if (btn) btn.classList.add('selected');
+        }
+
+        function handleProfileFormSubmit(e) {
+            e.preventDefault();
+            const newName = document.getElementById('profileNameInput').value.trim();
+            const newAvatar = document.getElementById('profileAvatarInput').value;
+            
+            if (newName) {
+                if (!userData) userData = {};
+                userData.name = newName;
+                userData.avatar = newAvatar;
+                
+                saveToStorage();
+                updateAccountLabels();
+                closeProfileModal();
+            }
+        }
+
+        function logoutUser() {
+            if (confirm("Tem certeza que deseja sair da conta?")) {
+                auth.signOut().then(() => {
+                    window.location.reload();
+                }).catch(err => {
+                    alert("Erro ao fazer logout: " + err.message);
+                });
+            }
+        }
+
     </script>
 </body>
 </html>
