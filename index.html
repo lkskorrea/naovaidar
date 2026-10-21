@@ -21,11 +21,11 @@
     
     <style>
         :root {
-            /* MODO ESCURO (PADRÃO) */
+            /* MODO ESCURO (PADRÃO AZUL) */
             --success: #10B981; 
             --danger: #EF4444; 
             --warning: #F59E0B; 
-            --primary-accent: #3B82F6;
+            --primary-accent: #3B82F6; /* Azul Padrão */
             --bg: #0B1120; 
             --card-bg: #172136; 
             --header-bg: linear-gradient(135deg, #1E3A8A, #0F172A);
@@ -36,7 +36,7 @@
         }
 
         [data-theme="light"] {
-            /* MODO CLARO */
+            /* MODO CLARO (PADRÃO AZUL) */
             --success: #059669; 
             --danger: #DC2626; 
             --warning: #D97706; 
@@ -47,6 +47,19 @@
             --text: #0F172A; 
             --text-muted: #475569; 
             --border: #CBD5E1;
+        }
+
+        /* --- NOVO TEMA LARANJA --- */
+        [data-color="orange"] {
+            /* MODO ESCURO (LARANJA) */
+            --primary-accent: #F97316; 
+            --header-bg: linear-gradient(135deg, #9A3412, #431407);
+        }
+
+        [data-theme="light"][data-color="orange"] {
+            /* MODO CLARO (LARANJA) */
+            --primary-accent: #EA580C; 
+            --header-bg: linear-gradient(135deg, #FDBA74, #EA580C);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
@@ -68,7 +81,7 @@
         #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2600 !important; }
         #calendarPickerModal { z-index: 2700 !important; }
         #deleteModal, #wipeModal, #walletModal, #calcModal { z-index: 2800 !important; }
-        #customConfirmModal, #customAlertModal { z-index: 4500 !important; align-items: center !important; }
+        #customConfirmModal, #customAlertModal { z-index: 5000 !important; align-items: center !important; }
 
         @supports (-webkit-touch-callout: default) {
             header { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
@@ -78,7 +91,7 @@
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%; }
         .header-top-left { display: flex; align-items: center; gap: 10px; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
         
         .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; flex-shrink: 0; }
@@ -243,11 +256,6 @@
         .icon-option.selected { border-color: var(--primary-accent); background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); }
 
         .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; font-weight: 600; cursor: default; background: var(--bg); border-radius: 8px; margin-bottom: 8px; padding-left: 12px; padding-right: 12px; }
-        
-        .report-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 5px; }
-        .report-table { width: 100%; min-width: 330px; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
-        .report-table th { border-bottom: 1px solid var(--border); padding: 8px 4px; text-align: left; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
-        .report-table td { padding: 10px 4px; border-bottom: 1px dashed var(--border); vertical-align: middle; color: var(--text); }
 
         .custom-select-trigger { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--text); outline: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
         .custom-select-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
@@ -272,7 +280,7 @@
         }
     </style>
 </head>
-<body data-theme="dark">
+<body data-theme="dark" data-color="blue">
 
     <div id="authScreen" style="display: none;">
         <div class="auth-card" id="authCardContent">
@@ -289,6 +297,7 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button class="header-btn" onclick="toggleColorTheme()" title="Mudar Cor Principal"><i class="fa-solid fa-palette"></i></button>
                 <label class="theme-switch" title="Alternar Tema">
                     <input type="checkbox" id="themeToggleCheckbox" onchange="toggleThemeSwitch(this)">
                     <span class="slider">
@@ -592,11 +601,13 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeReportModal()"></div>
             <div class="modal-header"><h3>Relatório Mensal</h3><button class="close-btn-minimal" onclick="closeReportModal()">✕</button></div>
-            <div id="reportModalContent"></div>
+            
+            <div id="reportSummary" style="display:flex; justify-content:space-between; margin-bottom: 15px; padding: 15px; background: var(--bg); border-radius: 12px; border: 1px solid var(--border);"></div>
+
+            <div id="reportModalContent" style="display:flex; flex-direction:column; gap:10px;"></div>
             
             <div style="display: flex; gap: 10px; margin-top: 20px;" id="reportActionButtons">
-                <button class="btn-primary" style="flex: 1; background: var(--danger); border: none;" onclick="exportReportPDF()"><i class="fa-solid fa-file-pdf"></i> Imprimir/PDF</button>
-                <button class="btn-primary" style="flex: 1; background: var(--success); border: none;" onclick="exportReportCSV()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                <button class="btn-primary" style="flex: 1; background: var(--danger); border: none;" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Imprimir/PDF</button>
             </div>
         </div>
     </div>
@@ -822,7 +833,9 @@
         let currentCalendarDate = new Date();
         let stagedCalendarDate = null; 
         let currentCalendarTarget = 'tx';
+        
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
+        let currentColor = localStorage.getItem('naovaidar_color') || 'blue';
 
         // === MONITOR DE ESTADO DA CONTA (FIREBASE) ===
         auth.onAuthStateChanged(async (user) => {
@@ -1052,6 +1065,18 @@
         }
 
         // === FUNÇÕES DA INTERFACE DO APP ===
+        function applyColor(color) {
+            currentColor = color;
+            document.body.setAttribute('data-color', color);
+            localStorage.setItem('naovaidar_color', color);
+            if(myChart) { myChart.update(); }
+        }
+
+        function toggleColorTheme() {
+            const newColor = currentColor === 'blue' ? 'orange' : 'blue';
+            applyColor(newColor);
+        }
+
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.setAttribute('data-theme', theme);
@@ -1087,6 +1112,7 @@
 
         function initApp() {
             applyTheme(currentTheme);
+            applyColor(currentColor);
             setSelectedDate(new Date().toISOString().substring(0, 10));
             updateAccountLabels(); 
             selectedMonthKey = new Date().toISOString().substring(0, 7);
@@ -1366,10 +1392,10 @@
         
         function updateAccountLabels() { 
             if(userData) { 
-                document.getElementById('userNameDisplay').textContent = userData.name || "Utilizador";
-                if(userData.avatar) {
-                    document.getElementById('userAvatarDisplay').textContent = userData.avatar;
-                }
+                const nameEl = document.getElementById('userNameDisplay');
+                const avatarEl = document.getElementById('userAvatarDisplay');
+                if(nameEl) nameEl.textContent = userData.name || "Utilizador";
+                if(avatarEl) avatarEl.textContent = userData.avatar || "🦁";
             } 
         }
 
@@ -1982,7 +2008,7 @@
                 const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
                 await user.reauthenticateWithCredential(credential);
                 
-                // Zera os dados financeiros e mantém o userData para o login continuar ativo
+                // Zera os dados financeiros
                 transactions = []; 
                 creditCards = [];
                 financialGoals = [];
@@ -2003,7 +2029,7 @@
             }
         }
 
-        // === FUNÇÕES DO RELATÓRIO ===
+        // === FUNÇÕES DO RELATÓRIO MENSAL EM CARDS ===
         function openReportModal() {
             document.getElementById('reportModal').classList.add('active');
             renderReport();
@@ -2015,26 +2041,66 @@
 
         function renderReport() {
             const container = document.getElementById('reportModalContent');
+            const summary = document.getElementById('reportSummary');
             let filteredTxs = transactions.filter(t => t.date && t.date.startsWith(selectedMonthKey));
             
             if(filteredTxs.length === 0) {
+                summary.style.display = 'none';
                 container.innerHTML = '<div class="empty-state">Sem lançamentos para este mês.</div>';
                 return;
             }
+
+            let totalRec = 0;
+            let totalDesp = 0;
+            filteredTxs.forEach(t => {
+                if(t.type === 'Receita') totalRec += t.amount;
+                else totalDesp += t.amount;
+            });
+
+            summary.style.display = 'flex';
+            summary.innerHTML = `
+                <div style="text-align:center; flex:1;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Receitas</span><br>
+                    <span style="color:var(--success); font-weight:700; font-size:1.1rem;">${formatCurrency(totalRec)}</span>
+                </div>
+                <div style="width:1px; background:var(--border); margin:0 10px;"></div>
+                <div style="text-align:center; flex:1;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Despesas</span><br>
+                    <span style="color:var(--danger); font-weight:700; font-size:1.1rem;">${formatCurrency(totalDesp)}</span>
+                </div>
+            `;
             
-            let html = '<div class="report-table-wrapper"><table class="report-table"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>';
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
             
             filteredTxs.sort((a,b) => a.date.localeCompare(b.date)).forEach(t => {
+                const catObj = categories.find(c => c.name === t.category);
+                const iconClass = catObj ? catObj.icon || 'fa-solid fa-tag' : 'fa-solid fa-tag';
+                const catColor = getCategoryColor(t.category);
                 const color = t.type === 'Receita' ? 'var(--success)' : 'var(--text)';
                 const sign = t.type === 'Receita' ? '+' : '-';
-                html += `<tr>
-                    <td style="white-space:nowrap">${formatDate(t.date)}</td>
-                    <td><strong>${t.desc}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${t.status}</span></td>
-                    <td>${t.category}</td>
-                    <td style="color:${color}; font-weight:bold; white-space:nowrap; text-align:right;">${sign} ${formatCurrency(t.amount)}</td>
-                </tr>`;
+                const dbStatus = t.status || 'Pago';
+                const statusText = dbStatus === 'Pago' ? 'Pago' : 'Pendente';
+                const statusColor = dbStatus === 'Pago' ? 'var(--success)' : 'var(--warning)';
+
+                html += `
+                <div class="list-item" style="align-items: flex-start; padding: 14px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: ${catColor}1A; color: ${catColor}; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; margin-right: 10px; border: 1px solid ${catColor}33; margin-top: 2px;">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="item-info" style="flex: 1; min-width: 0;">
+                        <h4 style="font-size: 0.95rem; margin-bottom: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text); font-weight: 700;">${t.desc}</h4>
+                        <p style="font-size: 0.75rem; margin-bottom: 6px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text-muted);">${t.category}</p>
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-regular fa-calendar"></i> ${formatDate(t.date)}</span>
+                            <span style="display:inline-flex; align-items:center; gap:3px; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:6px; background:${statusColor}1A; color:${statusColor}; border: 1px solid ${statusColor}33;"><i class="${dbStatus === 'Pago' ? 'fa-solid fa-check' : 'fa-regular fa-clock'}"></i> ${statusText}</span>
+                        </div>
+                    </div>
+                    <div class="item-right" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; margin-left: 8px;">
+                        <div class="item-amount" style="font-size: 0.95rem; font-weight: 700; color: ${color};">${sign} ${formatCurrency(t.amount)}</div>
+                    </div>
+                </div>`;
             });
-            html += '</tbody></table></div>';
+            html += '</div>';
             container.innerHTML = html;
         }
 
