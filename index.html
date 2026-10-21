@@ -25,7 +25,7 @@
             --success: #10B981; 
             --danger: #EF4444; 
             --warning: #F59E0B; 
-            --primary-accent: #3B82F6; /* Azul Padrão */
+            --primary-accent: #3B82F6; 
             --bg: #0B1120; 
             --card-bg: #172136; 
             --header-bg: linear-gradient(135deg, #1E3A8A, #0F172A);
@@ -49,17 +49,17 @@
             --border: #CBD5E1;
         }
 
-        /* --- NOVO TEMA LARANJA --- */
-        [data-color="orange"] {
-            /* MODO ESCURO (LARANJA) */
-            --primary-accent: #F97316; 
-            --header-bg: linear-gradient(135deg, #9A3412, #431407);
+        /* --- NOVO TEMA ROXO/VIOLETA --- */
+        [data-color="purple"] {
+            /* MODO ESCURO (ROXO) Mantém o mesmo fundo escuro */
+            --primary-accent: #8B5CF6; 
+            --header-bg: linear-gradient(135deg, #4C1D95, #2E1065);
         }
 
-        [data-theme="light"][data-color="orange"] {
-            /* MODO CLARO (LARANJA) */
-            --primary-accent: #EA580C; 
-            --header-bg: linear-gradient(135deg, #FDBA74, #EA580C);
+        [data-theme="light"][data-color="purple"] {
+            /* MODO CLARO (ROXO) */
+            --primary-accent: #7C3AED; 
+            --header-bg: linear-gradient(135deg, #A78BFA, #7C3AED);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
@@ -544,7 +544,7 @@
     <div class="modal" id="profileModal" onclick="checkModalClose(event, 'profileModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeProfileModal()"></div>
-            <div class="modal-header"><h3>Meu Perfil</h3><button class="close-btn-minimal" onclick="closeProfileModal()">✕</button></div>
+            <div class="modal-header"><h3>Configurações de Perfil</h3><button class="close-btn-minimal" onclick="closeProfileModal()">✕</button></div>
             <form onsubmit="handleProfileFormSubmit(event)">
                 <div class="form-group">
                     <label>Nome do Utilizador</label>
@@ -852,7 +852,7 @@
             }
         });
 
-        // === TELAS DE LOGIN E REGISTO COM AVISOS VISUAIS ===
+        // === TELAS DE LOGIN E REGISTO ===
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
@@ -1073,7 +1073,7 @@
         }
 
         function toggleColorTheme() {
-            const newColor = currentColor === 'blue' ? 'orange' : 'blue';
+            const newColor = currentColor === 'blue' ? 'purple' : 'blue';
             applyColor(newColor);
         }
 
@@ -1382,7 +1382,29 @@
         function openCategoryModal(oldName=null) { document.getElementById('categoryModal').classList.add('active'); if(oldName) { const c = categories.find(x => x.name === oldName); if(c) { document.getElementById('catOldName').value = c.name; document.getElementById('catName').value = c.name; document.getElementById('catType').value = c.type; document.getElementById('catIconInput').value = c.icon || 'fa-solid fa-tag'; document.getElementById('catBudget').value = c.budget || ''; } } else { document.getElementById('categoryForm').reset(); document.getElementById('catOldName').value = ''; document.getElementById('catIconInput').value = 'fa-solid fa-tag'; } }
         function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('active'); }
         function selectCatIcon(iconClass) { document.getElementById('catIconInput').value = iconClass; document.querySelectorAll('#catIconGrid .icon-option').forEach(el => el.classList.remove('selected')); if(event && event.currentTarget) event.currentTarget.classList.add('selected'); }
-        function handleCategoryFormSubmit(e) { e.preventDefault(); const oldName = document.getElementById('catOldName').value, name = document.getElementById('catName').value, type = document.getElementById('catType').value, icon = document.getElementById('catIconInput').value, budget = parseFloat(document.getElementById('catBudget').value) || 0; if(oldName) { const idx = categories.findIndex(x => x.name === oldName); if(idx !== -1) { categories[idx] = { name, type, icon, budget }; transactions.forEach(t => { if(t.category === oldName) t.category = name; }); } } else { categories.push({ name, type, icon, budget }); } saveToStorage(); closeCategoryModal(); updateUI(); }
+        function handleCategoryFormSubmit(e) { 
+            e.preventDefault(); 
+            const oldName = document.getElementById('catOldName').value; 
+            const name = document.getElementById('catName').value.trim(); 
+            const type = document.getElementById('catType').value; 
+            const icon = document.getElementById('catIconInput').value; 
+            const budget = parseFloat(document.getElementById('catBudget').value) || 0; 
+            
+            if(!name) return;
+
+            if(oldName) { 
+                const idx = categories.findIndex(x => x.name === oldName); 
+                if(idx !== -1) { 
+                    categories[idx] = { name, type, icon, budget }; 
+                    transactions.forEach(t => { if(t.category === oldName) t.category = name; }); 
+                } 
+            } else { 
+                categories.push({ name, type, icon, budget }); 
+            } 
+            saveToStorage(); 
+            closeCategoryModal(); 
+            updateUI(); 
+        }
         
         function deleteCategory(name) { 
             showConfirm("Excluir", "Excluir esta categoria?", () => {
@@ -2008,7 +2030,7 @@
                 const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
                 await user.reauthenticateWithCredential(credential);
                 
-                // Zera os dados financeiros
+                // Zera os dados financeiros e mantém o userData para o login continuar ativo
                 transactions = []; 
                 creditCards = [];
                 financialGoals = [];
