@@ -113,35 +113,11 @@
         
         .icon-box { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
 
-        /* Estilização Padronizada para os Botões de Ação (Editar e Excluir) */
-        .item-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .action-icon-btn {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .action-icon-btn:active {
-            transform: scale(0.95);
-        }
-        .action-icon-btn.delete {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--danger);
-        }
+        /* Estilização Padronizada para os Botões de Ação */
+        .item-actions { display: flex; gap: 8px; align-items: center; }
+        .action-icon-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .action-icon-btn:active { transform: scale(0.95); }
+        .action-icon-btn.delete { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); }
 
         .balance-card-custom { background: var(--card-bg); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); width: 100%; position: relative; }
         .balance-card-custom-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
@@ -240,7 +216,6 @@
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
 
         .custom-select-trigger { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
-        /* Para manter os ícones e os textos alinhados à esquerda nos selects */
         .custom-select-trigger span.select-text-left { display: flex; align-items: center; gap: 10px; flex: 1; }
 
         .custom-select-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
@@ -251,6 +226,21 @@
         .custom-date-day { padding: 10px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
         .custom-date-day.selected { background: var(--primary-accent); color: white; border-color: var(--primary-accent); }
         .custom-date-day.muted { opacity: 0.3; }
+
+        /* Estilização para o Drag and Drop Config */
+        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 24px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--primary-accent); }
+        input:checked + .toggle-slider:before { transform: translateX(22px); }
+
+        .drag-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: grab; transition: transform 0.2s, box-shadow 0.2s; }
+        .drag-item:active { cursor: grabbing; }
+        .drag-item.dragging { opacity: 0.5; transform: scale(0.98); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .drag-item.drag-over { border: 2px dashed var(--primary-accent); background: rgba(59, 130, 246, 0.05); }
+        .drag-handle { color: var(--text-muted); padding-right: 12px; font-size: 1.2rem; cursor: grab; }
+        .drag-content { flex: 1; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; color: var(--text); }
 
         @media print {
             body * { visibility: hidden; }
@@ -585,10 +575,20 @@
                 <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="goalName" required></div>
                 <div class="form-group"><label>Ícone</label>
                     <div class="icon-grid" id="goalIconGrid">
+                        <!-- Ícones Antigos -->
                         <div class="icon-option selected" onclick="selectGoalIcon('fa-solid fa-bullseye', this)"><i class="fa-solid fa-bullseye"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-car', this)"><i class="fa-solid fa-car"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-plane', this)"><i class="fa-solid fa-plane"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-house', this)"><i class="fa-solid fa-house"></i></div>
+                        <!-- Novos Ícones Adicionados -->
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-piggy-bank', this)"><i class="fa-solid fa-piggy-bank"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-graduation-cap', this)"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-laptop', this)"><i class="fa-solid fa-laptop"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-gamepad', this)"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-umbrella-beach', this)"><i class="fa-solid fa-umbrella-beach"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-mobile-screen-button', this)"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-motorcycle', this)"><i class="fa-solid fa-motorcycle"></i></div>
+                        <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-coins', this)"><i class="fa-solid fa-coins"></i></div>
                     </div>
                     <input type="hidden" id="goalIconInput" value="fa-solid fa-bullseye">
                 </div>
@@ -663,14 +663,12 @@
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                     <button type="submit" class="btn-primary">Salvar / Atualizar</button>
                     <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta</button>
-                    <!-- Nova Opção de Excluir Conta -->
                     <button type="button" class="btn-primary" style="background: transparent; border: 1px solid var(--danger); color: var(--danger);" onclick="openDeleteAccountModal()">Excluir Conta Permanentemente</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal Excluir Conta Permanentemente -->
     <div class="modal" id="deleteAccountModal" onclick="checkModalClose(event, 'deleteAccountModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeDeleteAccountModal()"></div>
@@ -687,7 +685,8 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeCardsConfigModal()"></div>
             <div class="modal-header"><h3>Editar Posição dos Blocos</h3><button class="close-btn-minimal" onclick="closeCardsConfigModal()">✕</button></div>
-            <div id="configToggleList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Segure e arraste as linhas para mudar a ordem no início do app.</p>
+            <div id="configToggleList" style="display: flex; flex-direction: column; gap: 0;"></div>
         </div>
     </div>
 
@@ -755,38 +754,6 @@
     </div>
 
     <script>
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
-
-        function playClickSound() {
-            try {
-                if (!window.AudioContext && !window.webkitAudioContext) return;
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.04);
-                
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.04);
-            } catch(e) {}
-        }
-
-        document.addEventListener('click', (e) => {
-            const isClickable = e.target.closest('button, .menu-option, .nav-item, .icon-option, .color-swatch, .custom-select-item, .filter-chip, .custom-date-day, .action-icon-btn, .header-btn, .account-badge, .month-selector, .wallet-banner, .type-btn, .custom-select-trigger');
-            if (isClickable) playClickSound();
-        });
-
         function checkModalClose(event, modalId) { if (event.target.id === modalId) document.getElementById(modalId).classList.remove('active'); }
 
         let confirmCallbackFn = null;
@@ -1200,9 +1167,9 @@
             try {
                 const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
                 await user.reauthenticateWithCredential(credential);
-                await db.collection('users').doc(user.uid).delete(); // Deletar dados no Firestore
-                await user.delete(); // Deletar usuário no Firebase Auth
-                window.location.reload(); // Recarregar e voltar ao login
+                await db.collection('users').doc(user.uid).delete();
+                await user.delete();
+                window.location.reload();
             } catch (error) {
                 console.error(error); 
                 showAlert("Erro", "A senha está incorreta ou ocorreu um erro ao excluir a conta.");
@@ -1563,20 +1530,84 @@
             html += '</div>'; container.innerHTML = html;
         }
 
+        // Lógica de Drag and Drop para o menu de configurações de Blocos
+        let draggedItemKey = null;
+
         function openCardsConfigModal() {
-            const list = document.getElementById('configToggleList'); list.innerHTML = '';
+            const list = document.getElementById('configToggleList');
+            list.innerHTML = '';
+            
             const names = { netBalance: 'Dashboard Analítico', pendenciasCard: 'Pendências', creditCardsPreview: 'Meus Cartões', goalsPreview: 'Metas', categorySummary: 'Resumo por Categoria', transactionsPreview: 'Últimas Movimentações (Extrato)', vaultPreview: 'Cofre' };
-            homeConfig.order.forEach((key, index) => {
-                const div = document.createElement('div'); div.className = 'toggle-row'; div.dataset.key = key;
-                div.innerHTML = `<label style="display:flex; align-items:center; gap:8px; font-size:0.95rem; cursor:pointer; flex:1;"><input type="checkbox" style="width:18px; height:18px;" ${homeConfig.visibility[key] ? 'checked' : ''} onchange="toggleCardVis('${key}', this.checked)"> ${names[key] || key}</label><div style="display:flex; gap: 8px;"><button type="button" class="btn-sm" style="background:var(--border); color:var(--text); padding: 8px 12px; border-radius: 6px;" onclick="moveCardUp(${index})" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}><i class="fa-solid fa-arrow-up"></i></button><button type="button" class="btn-sm" style="background:var(--border); color:var(--text); padding: 8px 12px; border-radius: 6px;" onclick="moveCardDown(${index})" ${index === homeConfig.order.length - 1 ? 'disabled style="opacity:0.3"' : ''}><i class="fa-solid fa-arrow-down"></i></button></div>`;
+            const icons = { netBalance: 'fa-chart-pie', pendenciasCard: 'fa-file-invoice-dollar', creditCardsPreview: 'fa-credit-card', goalsPreview: 'fa-bullseye', categorySummary: 'fa-tags', transactionsPreview: 'fa-list-ul', vaultPreview: 'fa-vault' };
+
+            homeConfig.order.forEach((key) => {
+                const div = document.createElement('div');
+                div.className = 'drag-item';
+                div.dataset.key = key;
+                div.draggable = true;
+
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <div class="drag-handle"><i class="fa-solid fa-grip-lines"></i></div>
+                        <div class="drag-content"><i class="fa-solid ${icons[key] || 'fa-block'}" style="color:var(--text-muted); width: 20px; text-align: center;"></i> ${names[key] || key}</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${homeConfig.visibility[key] ? 'checked' : ''} onchange="toggleCardVis('${key}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                `;
+
+                div.addEventListener('dragstart', (e) => {
+                    draggedItemKey = key;
+                    div.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                div.addEventListener('dragend', () => {
+                    draggedItemKey = null;
+                    div.classList.remove('dragging');
+                    document.querySelectorAll('.drag-item').forEach(el => el.classList.remove('drag-over'));
+                });
+
+                div.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    div.classList.add('drag-over');
+                });
+
+                div.addEventListener('dragleave', () => {
+                    div.classList.remove('drag-over');
+                });
+
+                div.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    div.classList.remove('drag-over');
+                    if (draggedItemKey && draggedItemKey !== key) {
+                        const fromIndex = homeConfig.order.indexOf(draggedItemKey);
+                        const toIndex = homeConfig.order.indexOf(key);
+                        homeConfig.order.splice(fromIndex, 1);
+                        homeConfig.order.splice(toIndex, 0, draggedItemKey);
+                        
+                        saveToStorage();
+                        openCardsConfigModal();
+                        updateUI();
+                    }
+                });
+
                 list.appendChild(div);
             });
             document.getElementById('cardsConfigModal').classList.add('active');
         }
-        function toggleCardVis(key, isVisible) { homeConfig.visibility[key] = isVisible; saveToStorage(); updateUI(); }
-        function moveCardUp(index) { if(index > 0) { const temp = homeConfig.order[index]; homeConfig.order[index] = homeConfig.order[index-1]; homeConfig.order[index-1] = temp; saveToStorage(); openCardsConfigModal(); updateUI(); } }
-        function moveCardDown(index) { if(index < homeConfig.order.length - 1) { const temp = homeConfig.order[index]; homeConfig.order[index] = homeConfig.order[index+1]; homeConfig.order[index+1] = temp; saveToStorage(); openCardsConfigModal(); updateUI(); } }
-        function closeCardsConfigModal() { document.getElementById('cardsConfigModal').classList.remove('active'); }
+
+        function toggleCardVis(key, isVisible) { 
+            homeConfig.visibility[key] = isVisible; 
+            saveToStorage(); 
+            updateUI(); 
+        }
+
+        function closeCardsConfigModal() { 
+            document.getElementById('cardsConfigModal').classList.remove('active'); 
+        }
     </script>
 </body>
 </html>
