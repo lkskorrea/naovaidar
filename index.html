@@ -54,7 +54,6 @@
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(var(--calendar-invert, 1)); }
         [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); }
 
-        /* HIERARQUIA DE Z-INDEX UNIFICADA E CORRIGIDA */
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); position: relative; z-index: 1000; }
         .account-badge { position: relative; z-index: 1001; }
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; padding: 14px 0 18px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; border-top: 1px solid var(--border); }
@@ -68,7 +67,7 @@
         #profileModal { z-index: 2200 !important; }
         #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2600 !important; }
         #calendarPickerModal { z-index: 2700 !important; }
-        #deleteModal, #wipeModal, #walletModal, #calcModal { z-index: 2800 !important; }
+        #deleteModal, #wipeModal, #deleteAccountModal, #walletModal, #calcModal { z-index: 2800 !important; }
         #customConfirmModal, #customAlertModal { z-index: 5000 !important; align-items: center !important; }
 
         @supports (-webkit-touch-callout: default) {
@@ -112,8 +111,37 @@
         .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0; display: flex; justify-content: space-between; align-items: center; }
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); margin: 0; }
         
-        /* Minimalist Icon Style */
         .icon-box { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+
+        /* Estilização Padronizada para os Botões de Ação (Editar e Excluir) */
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .action-icon-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .action-icon-btn:active {
+            transform: scale(0.95);
+        }
+        .action-icon-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
 
         .balance-card-custom { background: var(--card-bg); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); width: 100%; position: relative; }
         .balance-card-custom-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
@@ -212,6 +240,9 @@
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
 
         .custom-select-trigger { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+        /* Para manter os ícones e os textos alinhados à esquerda nos selects */
+        .custom-select-trigger span.select-text-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+
         .custom-select-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .custom-select-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-weight: 600; }
         .custom-select-item.selected { border-color: var(--primary-accent); background: rgba(59, 130, 246, 0.1); }
@@ -474,17 +505,17 @@
                 </div>
                 <div class="form-group">
                     <label>Data</label>
-                    <div class="custom-select-trigger" onclick="openCalendarPicker('tx')"><span id="txDateSelectedText">...</span><i class="fa-solid fa-calendar"></i></div>
+                    <div class="custom-select-trigger" onclick="openCalendarPicker('tx')"><span id="txDateSelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div>
                     <input type="hidden" id="txDate" required>
                 </div>
                 <div class="form-group">
                     <label>Categoria</label>
-                    <div class="custom-select-trigger" onclick="openCategoryPicker()"><span id="txCategorySelectedText">...</span><i class="fa-solid fa-chevron-down"></i></div>
+                    <div class="custom-select-trigger" onclick="openCategoryPicker()"><span id="txCategorySelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div>
                     <input type="hidden" id="txCategory" required>
                 </div>
                 <div class="form-group" id="paymentMethodGroup">
                     <label>Meio de Pagamento</label>
-                    <div class="custom-select-trigger" onclick="openPaymentPicker()"><span id="txPaymentMethodSelectedText">Dinheiro / Débito / PIX</span><i class="fa-solid fa-chevron-down"></i></div>
+                    <div class="custom-select-trigger" onclick="openPaymentPicker()"><span id="txPaymentMethodSelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div>
                     <input type="hidden" id="txPaymentMethod" value="Dinheiro / Débito / PIX">
                 </div>
                 <div class="form-group" id="ccCardGroup" style="display: none;">
@@ -495,7 +526,7 @@
                 <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" class="form-control" id="txAmount" required></div>
                 <div class="form-group" id="frequencyGroupContainer">
                     <label>Frequência</label>
-                    <div class="custom-select-trigger" onclick="openFrequencyPicker()"><span id="txFrequencySelectedText">Único</span><i class="fa-solid fa-chevron-down"></i></div>
+                    <div class="custom-select-trigger" onclick="openFrequencyPicker()"><span id="txFrequencySelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div>
                     <input type="hidden" id="txFrequency" value="unico">
                 </div>
                 <div class="form-group" id="installmentCountGroup" style="display: none;">
@@ -506,7 +537,7 @@
                 </div>
                 <div class="form-group">
                     <label>Status</label>
-                    <div class="custom-select-trigger" onclick="openStatusPicker()"><span id="txStatusSelectedText">Pago</span><i class="fa-solid fa-chevron-down"></i></div>
+                    <div class="custom-select-trigger" onclick="openStatusPicker()"><span id="txStatusSelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div>
                     <input type="hidden" id="txStatus" value="Pago">
                 </div>
                 <div class="form-group"><label>Observações</label><input type="text" class="form-control" id="txObs"></div>
@@ -588,9 +619,9 @@
                 <input type="hidden" id="vaultId">
                 <div class="form-group"><label>Nome (Ex: Poupança, CDB)</label><input type="text" class="form-control" id="vaultName" required></div>
                 <div class="form-group"><label>Valor Inicial (R$)</label><input type="number" step="0.01" class="form-control" id="vaultAmount" required></div>
-                <div class="form-group"><label>Data Início</label><div class="custom-select-trigger" onclick="openCalendarPicker('vault')"><span id="vaultDateSelectedText">...</span></div><input type="hidden" id="vaultDate"></div>
+                <div class="form-group"><label>Data Início</label><div class="custom-select-trigger" onclick="openCalendarPicker('vault')"><span id="vaultDateSelectedText" class="select-text-left">...</span><i class="fa-solid fa-chevron-down"></i></div><input type="hidden" id="vaultDate"></div>
                 <div class="form-group"><label>Rendimento (%)</label><input type="number" step="0.01" class="form-control" id="vaultRate" required></div>
-                <div class="form-group"><label>Período</label><div class="custom-select-trigger" onclick="openVaultRatePicker()"><span id="vaultRateSelectedText">% ao Ano</span></div><input type="hidden" id="vaultRateType" value="ao Ano"></div>
+                <div class="form-group"><label>Período</label><div class="custom-select-trigger" onclick="openVaultRatePicker()"><span id="vaultRateSelectedText" class="select-text-left">% ao Ano</span><i class="fa-solid fa-chevron-down"></i></div><input type="hidden" id="vaultRateType" value="ao Ano"></div>
                 <button type="submit" class="btn-primary">Salvar</button>
             </form>
         </div>
@@ -631,8 +662,23 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                     <button type="submit" class="btn-primary">Salvar / Atualizar</button>
-                    <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta (Logout)</button>
+                    <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta</button>
+                    <!-- Nova Opção de Excluir Conta -->
+                    <button type="button" class="btn-primary" style="background: transparent; border: 1px solid var(--danger); color: var(--danger);" onclick="openDeleteAccountModal()">Excluir Conta Permanentemente</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Excluir Conta Permanentemente -->
+    <div class="modal" id="deleteAccountModal" onclick="checkModalClose(event, 'deleteAccountModal')">
+        <div class="modal-content">
+            <div class="modal-handle-bar" onclick="closeDeleteAccountModal()"></div>
+            <div class="modal-header"><h3>Excluir Conta</h3><button class="close-btn-minimal" type="button" onclick="closeDeleteAccountModal()">✕</button></div>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação é <strong>IRREVERSÍVEL</strong>. Todos os seus dados, lançamentos e informações da conta serão apagados permanentemente.<br><br>Confirme digitando a sua senha:</p>
+            <form onsubmit="handleDeleteAccount(event)">
+                <div class="form-group"><input type="password" class="form-control" id="deleteAccountPassword" required placeholder="Senha..."></div>
+                <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnDeleteAccount">Confirmar Exclusão</button>
             </form>
         </div>
     </div>
@@ -764,9 +810,7 @@
             document.getElementById('alertMessage').innerHTML = message;
             document.getElementById('customAlertModal').classList.add('active');
         }
-        function closeCustomAlert() {
-            document.getElementById('customAlertModal').classList.remove('active');
-        }
+        function closeCustomAlert() { document.getElementById('customAlertModal').classList.remove('active'); }
 
         const firebaseConfig = {
             apiKey: "AIzaSyD95syW4nmNEkoTzhlDcdnOahkQQ0_ZgjY",
@@ -1066,17 +1110,17 @@
             if(id) {
                 const v = vaults.find(x => x.id === id);
                 if(v) {
-                    document.getElementById('vaultId').value = v.id; document.getElementById('vaultName').value = v.name; document.getElementById('vaultAmount').value = v.amount; document.getElementById('vaultRate').value = v.rate; document.getElementById('vaultRateType').value = v.rateType || 'ao Ano'; document.getElementById('vaultRateSelectedText').textContent = `% ${v.rateType || 'ao Ano'}`;
+                    document.getElementById('vaultId').value = v.id; document.getElementById('vaultName').value = v.name; document.getElementById('vaultAmount').value = v.amount; document.getElementById('vaultRate').value = v.rate; document.getElementById('vaultRateType').value = v.rateType || 'ao Ano'; document.getElementById('vaultRateSelectedText').innerHTML = `<i class="fa-solid fa-percent" style="color:var(--warning); font-size:1.1rem; width:20px; text-align:center;"></i> <span>% ${v.rateType || 'ao Ano'}</span>`;
                     currentCalendarTarget = 'vault'; setSelectedDate(v.date || new Date().toISOString().substring(0, 10));
                 }
             } else {
-                document.getElementById('vaultForm').reset(); document.getElementById('vaultId').value = ''; document.getElementById('vaultRateType').value = 'ao Ano'; document.getElementById('vaultRateSelectedText').textContent = '% ao Ano';
+                document.getElementById('vaultForm').reset(); document.getElementById('vaultId').value = ''; document.getElementById('vaultRateType').value = 'ao Ano'; document.getElementById('vaultRateSelectedText').innerHTML = `<i class="fa-solid fa-percent" style="color:var(--warning); font-size:1.1rem; width:20px; text-align:center;"></i> <span>% ao Ano</span>`;
                 currentCalendarTarget = 'vault'; setSelectedDate(new Date().toISOString().substring(0, 10));
             }
         }
         function closeVaultModal() { document.getElementById('vaultModal').classList.remove('active'); }
         function handleVaultFormSubmit(e) { e.preventDefault(); const id = document.getElementById('vaultId').value; const name = document.getElementById('vaultName').value; const amount = parseFloat(document.getElementById('vaultAmount').value) || 0; const date = document.getElementById('vaultDate').value; const rate = parseFloat(document.getElementById('vaultRate').value) || 0; const rateType = document.getElementById('vaultRateType').value; if(id) { const v = vaults.find(x => x.id == id); if(v) { v.name = name; v.amount = amount; v.date = date; v.rate = rate; v.rateType = rateType; } } else { vaults.push({ id: Date.now(), name, amount, date, rate, rateType }); } saveToStorage(); closeVaultModal(); updateUI(); }
-        function openVaultRatePicker() { const listContainer = document.getElementById('vaultRatePickerList'); listContainer.innerHTML = ''; ['ao Ano', 'ao Mês'].forEach(type => { const item = document.createElement('div'); item.className = 'custom-select-item'; item.innerHTML = `<span>% ${type}</span>`; item.onclick = () => { document.getElementById('vaultRateType').value = type; document.getElementById('vaultRateSelectedText').textContent = `% ${type}`; closeVaultRatePicker(); }; listContainer.appendChild(item); }); document.getElementById('vaultRatePickerModal').classList.add('active'); }
+        function openVaultRatePicker() { const listContainer = document.getElementById('vaultRatePickerList'); listContainer.innerHTML = ''; ['ao Ano', 'ao Mês'].forEach(type => { const item = document.createElement('div'); item.className = 'custom-select-item'; item.innerHTML = `<span>% ${type}</span>`; item.onclick = () => { document.getElementById('vaultRateType').value = type; document.getElementById('vaultRateSelectedText').innerHTML = `<i class="fa-solid fa-percent" style="color:var(--warning); font-size:1.1rem; width:20px; text-align:center;"></i> <span>% ${type}</span>`; closeVaultRatePicker(); }; listContainer.appendChild(item); }); document.getElementById('vaultRatePickerModal').classList.add('active'); }
         function closeVaultRatePicker() { document.getElementById('vaultRatePickerModal').classList.remove('active'); }
 
         function formatCurrency(val) { if(isPrivacyMode) return 'R$ •••••'; return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
@@ -1138,6 +1182,35 @@
         }
         function logoutUser() { showConfirm("Sair da Conta", "Tem certeza que deseja fazer logout?", () => { auth.signOut().then(() => window.location.reload()); }); }
 
+        function openDeleteAccountModal() { 
+            closeProfileModal(); 
+            document.getElementById('deleteAccountPassword').value = ''; 
+            document.getElementById('deleteAccountModal').classList.add('active'); 
+        }
+        function closeDeleteAccountModal() { document.getElementById('deleteAccountModal').classList.remove('active'); }
+        async function handleDeleteAccount(e) {
+            e.preventDefault(); 
+            const pass = document.getElementById('deleteAccountPassword').value; 
+            const btn = document.getElementById('btnDeleteAccount'); 
+            const user = auth.currentUser; 
+            if(!user) return;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
+            try {
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+                await user.reauthenticateWithCredential(credential);
+                await db.collection('users').doc(user.uid).delete(); // Deletar dados no Firestore
+                await user.delete(); // Deletar usuário no Firebase Auth
+                window.location.reload(); // Recarregar e voltar ao login
+            } catch (error) {
+                console.error(error); 
+                showAlert("Erro", "A senha está incorreta ou ocorreu um erro ao excluir a conta.");
+                btn.innerHTML = 'Confirmar Exclusão'; 
+                btn.disabled = false;
+            }
+        }
+
         function updateAccountLabels() { 
             if(userData) { 
                 const nameEl = document.getElementById('userNameDisplay');
@@ -1177,26 +1250,80 @@
             const availableCats = categories.filter(c => c.type === currentType); if (availableCats.length > 0) selectCategory(availableCats[0].name);
         }
 
-        function updateCategoryDropdown() { const listContainer = document.getElementById('categoryPickerList'); listContainer.innerHTML = ''; categories.filter(c => c.type === currentType).forEach(c => { const catColor = getCategoryColor(c.name), item = document.createElement('div'); item.className = 'custom-select-item'; item.innerHTML = `<div class="icon-box" style="background:${catColor}1A; color:${catColor}; font-size:1.1rem; width:32px; height:32px;"><i class="${c.icon || 'fa-solid fa-tag'}"></i></div><span style="flex:1; margin-left:10px;">${c.name}</span>`; item.onclick = () => { selectCategory(c.name); closeCategoryPicker(); }; listContainer.appendChild(item); }); }
+        function updateCategoryDropdown() { 
+            const listContainer = document.getElementById('categoryPickerList'); 
+            listContainer.innerHTML = ''; 
+            categories.filter(c => c.type === currentType).forEach(c => { 
+                const catColor = getCategoryColor(c.name), item = document.createElement('div'); 
+                item.className = 'custom-select-item'; 
+                item.innerHTML = `<i class="${c.icon || 'fa-solid fa-tag'}" style="color:${catColor}; font-size:1.1rem; width:24px; text-align:center;"></i> <span style="flex:1; margin-left:10px;">${c.name}</span>`; 
+                item.onclick = () => { selectCategory(c.name); closeCategoryPicker(); }; 
+                listContainer.appendChild(item); 
+            }); 
+        }
         function openCategoryPicker() { updateCategoryDropdown(); document.getElementById('categoryPickerModal').classList.add('active'); }
         function closeCategoryPicker() { document.getElementById('categoryPickerModal').classList.remove('active'); }
-        function selectCategory(catName) { document.getElementById('txCategory').value = catName; const catObj = categories.find(c => c.name === catName), iconClass = catObj ? catObj.icon || 'fa-solid fa-tag' : 'fa-solid fa-tag', catColor = getCategoryColor(catName); document.getElementById('txCategorySelectedText').innerHTML = `<div class="icon-box" style="background:${catColor}1A; color:${catColor}; font-size:1rem; width:24px; height:24px; margin-right:8px;"><i class="${iconClass}"></i></div>${catName}`; }
+        
+        function selectCategory(catName) { 
+            document.getElementById('txCategory').value = catName; 
+            const catObj = categories.find(c => c.name === catName), iconClass = catObj ? catObj.icon || 'fa-solid fa-tag' : 'fa-solid fa-tag', catColor = getCategoryColor(catName); 
+            document.getElementById('txCategorySelectedText').innerHTML = `<i class="${iconClass}" style="color:${catColor}; font-size:1.1rem; width:20px; text-align:center;"></i> <span>${catName}</span>`; 
+        }
 
         function openStatusPicker() { document.getElementById('statusPickerModal').classList.add('active'); }
         function closeStatusPicker() { document.getElementById('statusPickerModal').classList.remove('active'); }
-        function updateStatusDropdown() { const listContainer = document.getElementById('statusPickerList'); listContainer.innerHTML = ''; [{name: 'Pago', icon: 'fa-solid fa-check', color: 'var(--success)'}, {name: 'Pendente', icon: 'fa-solid fa-clock', color: 'var(--warning)'}].forEach(s => { const item = document.createElement('div'); item.className = 'custom-select-item'; item.innerHTML = `<div class="icon-box" style="background:${s.color}1A; color:${s.color}; font-size:1rem; width:32px; height:32px;"><i class="${s.icon}"></i></div><span style="flex:1; margin-left:10px;">${s.name}</span>`; item.onclick = () => { selectStatus(s.name); closeStatusPicker(); }; listContainer.appendChild(item); }); }
-        function selectStatus(statusName) { document.getElementById('txStatus').value = statusName; const icon = statusName === 'Pago' ? 'fa-solid fa-check' : 'fa-solid fa-clock', color = statusName === 'Pago' ? 'var(--success)' : 'var(--warning)'; document.getElementById('txStatusSelectedText').innerHTML = `<div class="icon-box" style="background:${color}1A; color:${color}; font-size:0.9rem; width:24px; height:24px; margin-right:8px;"><i class="${icon}"></i></div>${statusName}`; }
+        function updateStatusDropdown() { 
+            const listContainer = document.getElementById('statusPickerList'); 
+            listContainer.innerHTML = ''; 
+            [{name: 'Pago', icon: 'fa-solid fa-check', color: 'var(--success)'}, {name: 'Pendente', icon: 'fa-solid fa-clock', color: 'var(--warning)'}].forEach(s => { 
+                const item = document.createElement('div'); item.className = 'custom-select-item'; 
+                item.innerHTML = `<i class="${s.icon}" style="color:${s.color}; font-size:1.1rem; width:24px; text-align:center;"></i> <span style="flex:1; margin-left:10px;">${s.name}</span>`; 
+                item.onclick = () => { selectStatus(s.name); closeStatusPicker(); }; 
+                listContainer.appendChild(item); 
+            }); 
+        }
+        function selectStatus(statusName) { 
+            document.getElementById('txStatus').value = statusName; 
+            const icon = statusName === 'Pago' ? 'fa-solid fa-check' : 'fa-solid fa-clock', color = statusName === 'Pago' ? 'var(--success)' : 'var(--warning)'; 
+            document.getElementById('txStatusSelectedText').innerHTML = `<i class="${icon}" style="color:${color}; font-size:1.1rem; width:20px; text-align:center;"></i> <span>${statusName}</span>`; 
+        }
 
         function openFrequencyPicker() { document.getElementById('frequencyPickerModal').classList.add('active'); }
         function closeFrequencyPicker() { document.getElementById('frequencyPickerModal').classList.remove('active'); }
-        function updateFrequencyDropdown() { const listContainer = document.getElementById('frequencyPickerList'); listContainer.innerHTML = ''; const freqData = [{id: 'unico', name: 'Único', icon: 'fa-solid fa-calendar-day', color: 'var(--primary-accent)'}, {id: 'fixo', name: 'Fixo Mensal', icon: 'fa-solid fa-rotate', color: 'var(--warning)'}, {id: 'parcelado', name: 'Parcelado', icon: 'fa-solid fa-layer-group', color: 'var(--success)'}]; freqData.forEach(f => { const item = document.createElement('div'); item.className = 'custom-select-item'; item.innerHTML = `<div class="icon-box" style="background:${f.color}1A; color:${f.color}; font-size:1rem; width:32px; height:32px;"><i class="${f.icon}"></i></div><span style="flex:1; margin-left:10px;">${f.name}</span>`; item.onclick = () => { selectFrequency(f.id); closeFrequencyPicker(); toggleFrequencyFields(); }; listContainer.appendChild(item); }); }
-        function selectFrequency(freqId) { document.getElementById('txFrequency').value = freqId; const freqData = {'unico': { name: 'Único', color: 'var(--primary-accent)', icon: 'fa-solid fa-calendar-day' }, 'fixo': { name: 'Fixo Mensal', color: 'var(--warning)', icon: 'fa-solid fa-rotate' }, 'parcelado': { name: 'Parcelado', color: 'var(--success)', icon: 'fa-solid fa-layer-group' } }; const f = freqData[freqId] || freqData['unico']; document.getElementById('txFrequencySelectedText').innerHTML = `<div class="icon-box" style="background:${f.color}1A; color:${f.color}; font-size:0.9rem; width:24px; height:24px; margin-right:8px;"><i class="${f.icon}"></i></div>${f.name}`; }
+        function updateFrequencyDropdown() { 
+            const listContainer = document.getElementById('frequencyPickerList'); 
+            listContainer.innerHTML = ''; 
+            const freqData = [{id: 'unico', name: 'Único', icon: 'fa-solid fa-calendar-day', color: 'var(--primary-accent)'}, {id: 'fixo', name: 'Fixo Mensal', icon: 'fa-solid fa-rotate', color: 'var(--warning)'}, {id: 'parcelado', name: 'Parcelado', icon: 'fa-solid fa-layer-group', color: 'var(--success)'}]; 
+            freqData.forEach(f => { 
+                const item = document.createElement('div'); item.className = 'custom-select-item'; 
+                item.innerHTML = `<i class="${f.icon}" style="color:${f.color}; font-size:1.1rem; width:24px; text-align:center;"></i> <span style="flex:1; margin-left:10px;">${f.name}</span>`; 
+                item.onclick = () => { selectFrequency(f.id); closeFrequencyPicker(); toggleFrequencyFields(); }; 
+                listContainer.appendChild(item); 
+            }); 
+        }
+        function selectFrequency(freqId) { 
+            document.getElementById('txFrequency').value = freqId; 
+            const freqData = {'unico': { name: 'Único', color: 'var(--primary-accent)', icon: 'fa-solid fa-calendar-day' }, 'fixo': { name: 'Fixo Mensal', color: 'var(--warning)', icon: 'fa-solid fa-rotate' }, 'parcelado': { name: 'Parcelado', color: 'var(--success)', icon: 'fa-solid fa-layer-group' } }; 
+            const f = freqData[freqId] || freqData['unico']; 
+            document.getElementById('txFrequencySelectedText').innerHTML = `<i class="${f.icon}" style="color:${f.color}; font-size:1.1rem; width:20px; text-align:center;"></i> <span>${f.name}</span>`; 
+        }
         function toggleFrequencyFields() { document.getElementById('installmentCountGroup').style.display = document.getElementById('txFrequency').value === 'parcelado' ? 'block' : 'none'; }
 
         function openPaymentPicker() { document.getElementById('paymentPickerModal').classList.add('active'); }
         function closePaymentPicker() { document.getElementById('paymentPickerModal').classList.remove('active'); }
-        function updatePaymentDropdown() { const listContainer = document.getElementById('paymentPickerList'); listContainer.innerHTML = `<div class="custom-select-item" onclick="selectPaymentMethod('Dinheiro / Débito / PIX')"><div class="icon-box" style="background:var(--success)1A; color:var(--success); font-size:1rem; width:32px; height:32px;"><i class="fa-solid fa-wallet"></i></div><span style="flex:1; margin-left:10px;">Dinheiro / Débito / PIX</span></div>`; if (creditCards.length > 0) { listContainer.innerHTML += `<div class="custom-select-item" onclick="selectPaymentMethod('Cartão de Crédito')"><div class="icon-box" style="background:var(--warning)1A; color:var(--warning); font-size:1rem; width:32px; height:32px;"><i class="fa-solid fa-credit-card"></i></div><span style="flex:1; margin-left:10px;">Cartão de Crédito</span></div>`; } }
-        function selectPaymentMethod(methodName, ccId = null) { document.getElementById('txPaymentMethod').value = methodName; let icon = methodName.includes('Cartão') ? 'fa-solid fa-credit-card' : 'fa-solid fa-wallet'; let color = methodName.includes('Cartão') ? 'var(--warning)' : 'var(--success)'; document.getElementById('txPaymentMethodSelectedText').innerHTML = `<div class="icon-box" style="background:${color}1A; color:${color}; font-size:0.9rem; width:24px; height:24px; margin-right:8px;"><i class="${icon}"></i></div>${methodName}`; const ccGroup = document.getElementById('ccCardGroup'); if(methodName === 'Cartão de Crédito' || methodName.includes('Cartão')) { ccGroup.style.display = 'block'; const sel = document.getElementById('txCreditCardSelection'); sel.innerHTML = creditCards.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); if(ccId) sel.value = ccId; } else { ccGroup.style.display = 'none'; } closePaymentPicker(); }
+        function updatePaymentDropdown() { 
+            const listContainer = document.getElementById('paymentPickerList'); 
+            listContainer.innerHTML = `<div class="custom-select-item" onclick="selectPaymentMethod('Dinheiro / Débito / PIX')"><i class="fa-solid fa-wallet" style="color:var(--success); font-size:1.1rem; width:24px; text-align:center;"></i> <span style="flex:1; margin-left:10px;">Dinheiro / Débito / PIX</span></div>`; 
+            if (creditCards.length > 0) { listContainer.innerHTML += `<div class="custom-select-item" onclick="selectPaymentMethod('Cartão de Crédito')"><i class="fa-solid fa-credit-card" style="color:var(--warning); font-size:1.1rem; width:24px; text-align:center;"></i> <span style="flex:1; margin-left:10px;">Cartão de Crédito</span></div>`; } 
+        }
+        function selectPaymentMethod(methodName, ccId = null) { 
+            document.getElementById('txPaymentMethod').value = methodName; 
+            let icon = methodName.includes('Cartão') ? 'fa-solid fa-credit-card' : 'fa-solid fa-wallet'; 
+            let color = methodName.includes('Cartão') ? 'var(--warning)' : 'var(--success)'; 
+            document.getElementById('txPaymentMethodSelectedText').innerHTML = `<i class="${icon}" style="color:${color}; font-size:1.1rem; width:20px; text-align:center;"></i> <span>${methodName}</span>`; 
+            const ccGroup = document.getElementById('ccCardGroup'); 
+            if(methodName === 'Cartão de Crédito' || methodName.includes('Cartão')) { ccGroup.style.display = 'block'; const sel = document.getElementById('txCreditCardSelection'); sel.innerHTML = creditCards.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); if(ccId) sel.value = ccId; } else { ccGroup.style.display = 'none'; } closePaymentPicker(); 
+        }
 
         function openCalendarPicker(target = 'tx') { currentCalendarTarget = target; const targetInput = document.getElementById(target === 'tx' ? 'txDate' : 'vaultDate'); stagedCalendarDate = targetInput.value || new Date().toISOString().substring(0, 10); const [y, m, d] = stagedCalendarDate.split('-'); currentCalendarDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d)); renderCalendar(); document.getElementById('calendarPickerModal').classList.add('active'); }
         function closeCalendarPicker() { document.getElementById('calendarPickerModal').classList.remove('active'); }
@@ -1214,7 +1341,17 @@
             const totalCells = firstDayIndex + totalDays, remaining = totalCells <= 35 ? (35 - totalCells) : (42 - totalCells); 
             for (let i = 1; i <= remaining; i++) { const dCell = document.createElement('div'); dCell.className = 'custom-date-day muted'; dCell.textContent = i; grid.appendChild(dCell); } 
         }
-        function setSelectedDate(dateStr) { if(!dateStr) return; const [y, m, d] = dateStr.split('-'); if(currentCalendarTarget === 'tx') { document.getElementById('txDate').value = dateStr; document.getElementById('txDateSelectedText').textContent = `${d}/${m}/${y}`; } else { document.getElementById('vaultDate').value = dateStr; document.getElementById('vaultDateSelectedText').textContent = `${d}/${m}/${y}`; } }
+        function setSelectedDate(dateStr) { 
+            if(!dateStr) return; 
+            const [y, m, d] = dateStr.split('-'); 
+            if(currentCalendarTarget === 'tx') { 
+                document.getElementById('txDate').value = dateStr; 
+                document.getElementById('txDateSelectedText').innerHTML = `<i class="fa-solid fa-calendar-day" style="color:var(--text-muted); font-size:1.1rem; width:20px; text-align:center;"></i> <span>${d}/${m}/${y}</span>`; 
+            } else { 
+                document.getElementById('vaultDate').value = dateStr; 
+                document.getElementById('vaultDateSelectedText').innerHTML = `<i class="fa-solid fa-calendar-day" style="color:var(--text-muted); font-size:1.1rem; width:20px; text-align:center;"></i> <span>${d}/${m}/${y}</span>`; 
+            } 
+        }
 
         function handleFormSubmit(e) {
             e.preventDefault(); 
@@ -1321,9 +1458,9 @@
                         </div>
                         <div class="item-right" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; margin-left: 8px;">
                             <div class="item-amount ${t.type}" style="font-size: 0.95rem; font-weight: 700; color: ${t.type === 'Receita' ? 'var(--success)' : 'var(--text)'};">${t.type === 'Receita' ? '+' : '-'} ${formatCurrency(t.amount)}</div>
-                            <div class="item-actions" style="display: flex; gap: 6px;">
-                                <button onclick="openModal(${t.id})" class="action-icon-btn" style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="promptDelete(${t.id})" class="action-icon-btn delete" style="color: var(--danger); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i></button>
+                            <div class="item-actions">
+                                <button onclick="openModal(${t.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="promptDelete(${t.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>`; 
                     txContainer.appendChild(item); 
@@ -1334,28 +1471,28 @@
             if(ccContainer) {
                 ccContainer.innerHTML = '';
                 if(creditCards.length === 0) ccContainer.innerHTML = `<div class="card"><div class="empty-state">Nenhum cartão cadastrado.</div></div>`;
-                else { creditCards.forEach(c => { let totalFatura = 0; transactions.forEach(t => { if(t.paymentMethod && t.paymentMethod.includes('Cartão') && t.ccId == c.id && t.status === 'Pendente') totalFatura += t.amount; }); const disp = c.limit - totalFatura; const pct = Math.min(100, (totalFatura / c.limit) * 100).toFixed(0); const cColor = c.color || 'var(--warning)'; const card = document.createElement('div'); card.className = 'cc-card-modern'; card.innerHTML = `<div class="goal-card-top"><div class="goal-info-left"><div class="icon-box" style="color:${cColor}; background:${cColor}1A; border-color:${cColor}33;"><i class="fa-solid fa-credit-card"></i></div><div class="goal-title-area"><h4>${c.name}</h4><p>Vence dia ${c.dueDay}</p></div></div><div class="goal-numbers"><div class="goal-current-val" style="color:var(--danger)">${formatCurrency(totalFatura)}</div><div class="goal-target-val">Limite: ${formatCurrency(c.limit)}</div></div></div><div class="goal-progress-container"><div class="goal-progress-bar" style="width: ${pct}%; background: linear-gradient(90deg, ${cColor}, var(--danger));"></div></div><div class="goal-footer"><span>Disponível ${formatCurrency(Math.max(0, disp))}</span><div class="goal-actions"><button onclick="openCCModal(${c.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteCC(${c.id})" class="action-icon-btn delete" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button></div></div>`; ccContainer.appendChild(card); }); }
+                else { creditCards.forEach(c => { let totalFatura = 0; transactions.forEach(t => { if(t.paymentMethod && t.paymentMethod.includes('Cartão') && t.ccId == c.id && t.status === 'Pendente') totalFatura += t.amount; }); const disp = c.limit - totalFatura; const pct = Math.min(100, (totalFatura / c.limit) * 100).toFixed(0); const cColor = c.color || 'var(--warning)'; const card = document.createElement('div'); card.className = 'cc-card-modern'; card.innerHTML = `<div class="goal-card-top"><div class="goal-info-left"><div class="icon-box" style="color:${cColor}; background:${cColor}1A; border-color:${cColor}33;"><i class="fa-solid fa-credit-card"></i></div><div class="goal-title-area"><h4>${c.name}</h4><p>Vence dia ${c.dueDay}</p></div></div><div class="goal-numbers"><div class="goal-current-val" style="color:var(--danger)">${formatCurrency(totalFatura)}</div><div class="goal-target-val">Limite: ${formatCurrency(c.limit)}</div></div></div><div class="goal-progress-container"><div class="goal-progress-bar" style="width: ${pct}%; background: linear-gradient(90deg, ${cColor}, var(--danger));"></div></div><div class="goal-footer"><span>Disponível ${formatCurrency(Math.max(0, disp))}</span><div class="item-actions"><button onclick="openCCModal(${c.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteCC(${c.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button></div></div>`; ccContainer.appendChild(card); }); }
             }
 
             const catContainer = document.getElementById('categoryListContainer');
             if(catContainer) {
                 catContainer.innerHTML = '';
                 if(categories.length === 0) catContainer.innerHTML = '<div class="empty-state">Nenhuma categoria cadastrada.</div>';
-                else { categories.forEach(c => { const spent = catTotals[c.name] || 0, hasBudget = c.budget && c.budget > 0, isOver = hasBudget && spent > c.budget, iconClass = c.icon || 'fa-solid fa-tag', catColor = getCategoryColor(c.name), item = document.createElement('div'); item.className = 'list-item'; let html = `<div class="item-info" style="width:100%;"><h4><span class="icon-box" style="background:${catColor}1A; color:${catColor}; width:32px; height:32px; font-size:1rem;"><i class="${iconClass}"></i></span> ${c.name}</h4><p>${c.type} ${hasBudget ? '• Meta: ' + formatCurrency(c.budget) : ''}</p>`; if(hasBudget) { const pct = Math.min(100, (spent / c.budget) * 100), color = isOver ? 'var(--danger)' : (pct > 80 ? 'var(--warning)' : 'var(--success)'); html += `<div class="progress-bg"><div class="progress-fill" style="width: ${pct}%; background: ${color};"></div></div>`; } html += `</div><div class="item-actions" style="margin-left: 10px;"><button onclick="openCategoryModal('${c.name}')" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteCategory('${c.name}')" class="action-icon-btn delete" style="color: var(--danger)"><i class="fa-solid fa-trash"></i></button></div>`; item.innerHTML = html; catContainer.appendChild(item); }); }
+                else { categories.forEach(c => { const spent = catTotals[c.name] || 0, hasBudget = c.budget && c.budget > 0, isOver = hasBudget && spent > c.budget, iconClass = c.icon || 'fa-solid fa-tag', catColor = getCategoryColor(c.name), item = document.createElement('div'); item.className = 'list-item'; let html = `<div class="item-info" style="width:100%;"><h4><span class="icon-box" style="background:${catColor}1A; color:${catColor}; width:32px; height:32px; font-size:1rem;"><i class="${iconClass}"></i></span> ${c.name}</h4><p>${c.type} ${hasBudget ? '• Meta: ' + formatCurrency(c.budget) : ''}</p>`; if(hasBudget) { const pct = Math.min(100, (spent / c.budget) * 100), color = isOver ? 'var(--danger)' : (pct > 80 ? 'var(--warning)' : 'var(--success)'); html += `<div class="progress-bg"><div class="progress-fill" style="width: ${pct}%; background: ${color};"></div></div>`; } html += `</div><div class="item-actions" style="margin-left: 10px;"><button onclick="openCategoryModal('${c.name}')" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteCategory('${c.name}')" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button></div>`; item.innerHTML = html; catContainer.appendChild(item); }); }
             }
 
             const goalsContainer = document.getElementById('goalsListContainer');
             if(goalsContainer) {
                 goalsContainer.innerHTML = '';
                 if(financialGoals.length === 0) goalsContainer.innerHTML = '<div class="empty-state">Nenhuma meta cadastrada.</div>';
-                else { financialGoals.forEach(g => { const pct = g.target > 0 ? Math.min(100, (g.current / g.target) * 100).toFixed(1) : 0; const gColor = g.color || '#3B82F6'; const card = document.createElement('div'); card.className = 'goal-card-modern'; card.innerHTML = `<div class="goal-card-top"><div class="goal-info-left"><div class="icon-box" style="background:${gColor}1A; color:${gColor};"><i class="${g.icon}"></i></div><div class="goal-title-area"><h4>${g.name}</h4><p>${pct}% concluído</p></div></div><div class="goal-numbers"><div class="goal-current-val">${formatCurrency(g.current)}</div><div class="goal-target-val">de ${formatCurrency(g.target)}</div></div></div><div class="goal-progress-container"><div class="goal-progress-bar" style="width: ${pct}%; background:${gColor};"></div></div><div class="goal-footer"><span>Faltam ${formatCurrency(Math.max(0, g.target - g.current))}</span><div class="goal-actions"><button onclick="openGoalModal(${g.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteGoal(${g.id})" class="action-icon-btn delete" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button></div></div>`; goalsContainer.appendChild(card); }); }
+                else { financialGoals.forEach(g => { const pct = g.target > 0 ? Math.min(100, (g.current / g.target) * 100).toFixed(1) : 0; const gColor = g.color || '#3B82F6'; const card = document.createElement('div'); card.className = 'goal-card-modern'; card.innerHTML = `<div class="goal-card-top"><div class="goal-info-left"><div class="icon-box" style="background:${gColor}1A; color:${gColor};"><i class="${g.icon}"></i></div><div class="goal-title-area"><h4>${g.name}</h4><p>${pct}% concluído</p></div></div><div class="goal-numbers"><div class="goal-current-val">${formatCurrency(g.current)}</div><div class="goal-target-val">de ${formatCurrency(g.target)}</div></div></div><div class="goal-progress-container"><div class="goal-progress-bar" style="width: ${pct}%; background:${gColor};"></div></div><div class="goal-footer"><span>Faltam ${formatCurrency(Math.max(0, g.target - g.current))}</span><div class="item-actions"><button onclick="openGoalModal(${g.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteGoal(${g.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button></div></div>`; goalsContainer.appendChild(card); }); }
             }
 
             const vaultContainer = document.getElementById('vaultListContainer');
             if(vaultContainer) {
                 vaultContainer.innerHTML = '';
                 if(vaults.length === 0) vaultContainer.innerHTML = '<div class="empty-state">Nenhum cofre cadastrado.</div>';
-                else { vaults.forEach(v => { const card = document.createElement('div'); card.className = 'list-item'; card.innerHTML = `<div class="item-info"><h4><span class="icon-box" style="background:var(--warning)1A; color:var(--warning); width:32px; height:32px; font-size:1rem;"><i class="fa-solid fa-vault"></i></span> ${v.name}</h4><p>Taxa: ${v.rate}% ${v.rateType || 'ao Ano'}</p></div><div class="item-right"><div class="item-amount" style="color:var(--success);">${formatCurrency(v.amount)}</div><div class="item-actions"><button onclick="openVaultModal(${v.id})" class="action-icon-btn" style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-pen"></i></button><button onclick="deleteVault(${v.id})" class="action-icon-btn delete" style="color: var(--danger); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i></button></div></div>`; vaultContainer.appendChild(card); }); }
+                else { vaults.forEach(v => { const card = document.createElement('div'); card.className = 'list-item'; card.innerHTML = `<div class="item-info"><h4><span class="icon-box" style="background:var(--warning)1A; color:var(--warning); width:32px; height:32px; font-size:1rem;"><i class="fa-solid fa-vault"></i></span> ${v.name}</h4><p>Taxa: ${v.rate}% ${v.rateType || 'ao Ano'}</p></div><div class="item-right"><div class="item-amount" style="color:var(--success);">${formatCurrency(v.amount)}</div><div class="item-actions"><button onclick="openVaultModal(${v.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button><button onclick="deleteVault(${v.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button></div></div>`; vaultContainer.appendChild(card); }); }
             }
             if(document.getElementById('view-charts').classList.contains('active')) updateChart();
         }
