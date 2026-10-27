@@ -6,14 +6,9 @@
     <meta name="theme-color" content="#0B1120" id="metaThemeColor">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard Financeiro na Nuvem</title>
+    <title>Dashboard Financeiro Local</title>
     
     <link rel="manifest" href="manifest.json">
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -240,25 +235,16 @@
         .drag-handle { color: var(--text-muted); padding-right: 12px; font-size: 1.2rem; cursor: grab; }
         .drag-content { flex: 1; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; color: var(--text); }
 
-        /* Classes utilitárias */
         .sidebar-brand { display: none; }
         .fab-btn-text { display: none; }
 
-        /* ========================================================================= */
-        /* RESPONSIVIDADE DESKTOP (PC) - ADICIONADO PARA O ECRÃ GRANDE              */
-        /* ========================================================================= */
         @media (min-width: 768px) {
-            /* 1. Reset da Estrutura Base */
             body { padding-bottom: 0; padding-left: 260px; }
             .container { max-width: 1400px; padding: 30px 40px; }
-            
-            /* 2. Cabeçalho Adaptado */
             header { border-bottom-left-radius: 0; padding: 30px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
             .header-top { grid-column: 1 / -1; margin-bottom: 10px; }
             .month-selector { margin-bottom: 0; height: 100%; font-size: 1.1rem; }
             .wallet-banner { margin-bottom: 0; }
-            
-            /* 3. Transformando a Bottom Nav num Sidebar (Barra Lateral Esquerda) */
             .nav-bar {
                 top: 0; bottom: 0; left: 0; right: auto; width: 260px;
                 flex-direction: column; justify-content: flex-start;
@@ -268,11 +254,8 @@
                 box-shadow: 2px 0 15px rgba(0,0,0,0.05);
                 align-items: stretch;
             }
-            
-            /* Detalhes Visuais da Sidebar */
             .sidebar-brand { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 800; color: var(--text); padding: 0 24px; margin-bottom: 30px; margin-top: 10px; order: 0; }
             .sidebar-brand i { font-size: 1.5rem; color: var(--primary-accent); }
-            
             .fab-btn {
                 order: 1; margin: 0 24px 30px 24px; width: auto; height: 50px;
                 border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
@@ -280,13 +263,10 @@
             }
             .fab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
             .fab-btn-text { display: inline; font-size: 1rem; font-weight: 700; margin-left: 10px; }
-            
-            /* Reordenamento Flexbox para os botões manterem lógica e estrutura HTML originais */
-            .nav-bar button:nth-child(2) { order: 2; } /* Início */
-            .nav-bar button:nth-child(3) { order: 3; } /* Extrato */
-            .nav-bar button:nth-child(5) { order: 4; } /* Gráficos */
-            .nav-bar button:nth-child(6) { order: 5; } /* Cartões */
-            
+            .nav-bar button:nth-child(2) { order: 2; } 
+            .nav-bar button:nth-child(3) { order: 3; } 
+            .nav-bar button:nth-child(5) { order: 4; } 
+            .nav-bar button:nth-child(6) { order: 5; } 
             .nav-item { width: auto; margin: 4px 16px; flex-direction: row; justify-content: flex-start; padding: 14px 20px; border-radius: 12px; gap: 16px; font-size: 1rem; height: auto; }
             .nav-item i { font-size: 1.25rem; width: 24px; text-align: center; }
             .nav-item span { font-size: 1rem; font-weight: 600; }
@@ -294,43 +274,28 @@
             [data-theme="light"] .nav-item:hover { background: rgba(0,0,0,0.05); }
             .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); }
             .nav-item.active i { transform: none; }
-            
-            /* 4. Dashboard em Grelha (Grid) */
             #homeContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
             .balance-card-custom, .pendencias-card, .home-card-wrapper { margin: 0; height: 100%; }
             .card { height: 100%; }
-            
-            /* Animações e Hover Premium no PC */
             .custom-select-item:hover, .menu-option:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: rgba(59, 130, 246, 0.05); }
             .list-item:hover, .goal-card-modern:hover, .cc-card-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
             .action-icon-btn:hover { background: rgba(0,0,0,0.05); }
             .action-icon-btn.delete:hover { background: rgba(239, 68, 68, 0.2); }
             [data-theme="dark"] .action-icon-btn:hover { background: rgba(255,255,255,0.1); }
             .btn-primary:hover { filter: brightness(1.1); }
-            
-            /* Aumentar o Gráfico no PC */
             .chart-container { min-height: 450px !important; }
-            
-            /* Modais Elegantes no PC */
             .modal { align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
             .modal-content { max-width: 500px; border-radius: 24px; max-height: 85vh; border: 1px solid var(--border); box-shadow: 0 15px 50px rgba(0,0,0,0.2); margin: auto; }
             .modal-handle-bar { display: none; }
-            
-            /* Grids nos Modais */
             #monthPickerList, .custom-select-list, .icon-grid, .color-swatch-container { gap: 12px; }
-            
-            /* Scrollbar personalizada */
             ::-webkit-scrollbar { width: 8px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
             ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         }
-
-        /* 5. Ajustes para Ecrãs Ultrawide */
         @media (min-width: 1400px) {
             #homeContainer { grid-template-columns: repeat(3, 1fr); }
         }
-
         @media print {
             body * { visibility: hidden; }
             #reportModal, #reportModal * { visibility: visible; }
@@ -443,7 +408,7 @@
         </div>
     </div>
 
-    <!-- Navegação (Barra Inferior Móvel / Barra Lateral Desktop) -->
+    <!-- Navegação -->
     <nav class="nav-bar" id="bottomNavBar">
         <div class="sidebar-brand"><i class="fa-solid fa-cloud"></i> FinanceDash</div>
         <button class="nav-item active" onclick="switchView('dashboard', this)"><i class="fa-solid fa-chart-line"></i><span>Início</span></button>
@@ -455,7 +420,7 @@
         <button class="nav-item" onclick="switchView('creditcard', this)"><i class="fa-solid fa-credit-card"></i><span>Cartões</span></button>
     </nav>
 
-    <!-- Modals (Lógica Visual e HTML Inalterados, responsividade CSS tratada na tag style) -->
+    <!-- Modals -->
     <div class="modal" id="customConfirmModal" onclick="checkModalClose(event, 'customConfirmModal')">
         <div class="modal-content" style="margin: auto; max-width: 350px; border-radius: 20px;">
             <h3 id="confirmTitle" style="margin-bottom: 12px;">Confirmar</h3>
@@ -668,12 +633,10 @@
                 <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="goalName" required></div>
                 <div class="form-group"><label>Ícone</label>
                     <div class="icon-grid" id="goalIconGrid">
-                        <!-- Ícones Antigos -->
                         <div class="icon-option selected" onclick="selectGoalIcon('fa-solid fa-bullseye', this)"><i class="fa-solid fa-bullseye"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-car', this)"><i class="fa-solid fa-car"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-plane', this)"><i class="fa-solid fa-plane"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-house', this)"><i class="fa-solid fa-house"></i></div>
-                        <!-- Novos Ícones Adicionados -->
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-piggy-bank', this)"><i class="fa-solid fa-piggy-bank"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-graduation-cap', this)"><i class="fa-solid fa-graduation-cap"></i></div>
                         <div class="icon-option" onclick="selectGoalIcon('fa-solid fa-laptop', this)"><i class="fa-solid fa-laptop"></i></div>
@@ -732,6 +695,14 @@
             <button class="menu-option" onclick="closeMenuModal(); openCalcModal()"><div class="icon-box" style="background: rgba(16, 185, 129, 0.15); color: #10B981;"><i class="fa-solid fa-calculator"></i></div> <span>Calculadora</span></button>
             <button class="menu-option" onclick="closeMenuModal(); openReportModal()"><div class="icon-box" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;"><i class="fa-solid fa-file-invoice-dollar"></i></div> <span>Relatório Mensal</span></button>
             
+            <div style="height: 1px; background: var(--border); margin: 15px 0;"></div>
+            
+            <button class="menu-option" onclick="exportBackup()"><div class="icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fa-solid fa-download"></i></div> <span>Exportar Backup (JSON)</span></button>
+            <button class="menu-option" onclick="triggerImport()"><div class="icon-box" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);"><i class="fa-solid fa-upload"></i></div> <span>Importar Backup (JSON)</span></button>
+            <input type="file" id="importBackupFile" accept=".json" style="display: none;" onchange="handleImportBackup(event)">
+            
+            <div style="height: 1px; background: var(--border); margin: 15px 0;"></div>
+
             <button class="menu-option" onclick="closeMenuModal(); openWipeModal()"><div class="icon-box" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-rotate-right"></i></div> <span style="color: var(--danger);">Redefinir Aplicativo</span></button>
         </div>
     </div>
@@ -742,7 +713,7 @@
             <div class="modal-header"><h3>Meu Perfil</h3><button class="close-btn-minimal" type="button" onclick="closeProfileModal()">✕</button></div>
             <form onsubmit="handleProfileFormSubmit(event)">
                 <div class="form-group">
-                    <label>Nome do Utilizador</label>
+                    <label>Nome do Utilizador (Visível)</label>
                     <input type="text" class="form-control" id="profileNameInput" required>
                 </div>
                 <div class="form-group">
@@ -766,7 +737,7 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeDeleteAccountModal()"></div>
             <div class="modal-header"><h3>Excluir Conta</h3><button class="close-btn-minimal" type="button" onclick="closeDeleteAccountModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação é <strong>IRREVERSÍVEL</strong>. Todos os seus dados, lançamentos e informações da conta serão apagados permanentemente.<br><br>Confirme digitando a sua senha:</p>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação é <strong>IRREVERSÍVEL</strong>. Todos os seus dados locais desta conta serão apagados permanentemente.<br><br>Confirme digitando a sua senha:</p>
             <form onsubmit="handleDeleteAccount(event)">
                 <div class="form-group"><input type="password" class="form-control" id="deleteAccountPassword" required placeholder="Senha..."></div>
                 <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnDeleteAccount">Confirmar Exclusão</button>
@@ -787,7 +758,7 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeWipeModal()"></div>
             <div class="modal-header"><h3>Redefinir Aplicativo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação apagará TODOS os lançamentos financeiros. Confirme com a sua senha:</p>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação apagará TODOS os lançamentos financeiros da sua conta. Confirme com a sua senha:</p>
             <form onsubmit="handleWipeAll(event)">
                 <div class="form-group"><input type="password" class="form-control" id="wipePassword" required placeholder="Senha..."></div>
                 <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnWipeAll">Confirmar Redefinição</button>
@@ -872,18 +843,9 @@
         }
         function closeCustomAlert() { document.getElementById('customAlertModal').classList.remove('active'); }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD95syW4nmNEkoTzhlDcdnOahkQQ0_ZgjY",
-            authDomain: "dashboard-financeiro-572a4.firebaseapp.com",
-            projectId: "dashboard-financeiro-572a4",
-            storageBucket: "dashboard-financeiro-572a4.firebasestorage.app",
-            messagingSenderId: "602198336399",
-            appId: "1:602198336399:web:7504565dec3fd7a68f21fa"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // Variáveis Locais em vez de Firebase
+        let localDB = JSON.parse(localStorage.getItem('finDash_users')) || {};
+        let currentUserKey = localStorage.getItem('finDash_currentUser');
 
         const defaultCategories = [ 
             { name: "Moradia", type: "Despesa", icon: "fa-solid fa-house", budget: 0 }, 
@@ -922,29 +884,33 @@
         let stagedCalendarDate = null; 
         let currentCalendarTarget = 'tx';
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
-        let isRegistering = false;
 
-        auth.onAuthStateChanged(async (user) => {
+        window.addEventListener('DOMContentLoaded', checkAuth);
+
+        function checkAuth() {
             const authScreen = document.getElementById('authScreen');
-            if (user && !isRegistering) {
+            if (currentUserKey && localDB[currentUserKey]) {
                 authScreen.style.display = 'flex';
-                document.getElementById('authCardContent').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-accent); margin-bottom:15px;"></i><p>Carregando...</p>';
-                await loadUserData(user.uid);
-                authScreen.style.display = 'none';
-                initApp();
-            } else if (!user) {
+                document.getElementById('authCardContent').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-accent); margin-bottom:15px;"></i><p>A Carregar Dados...</p>';
+                
+                setTimeout(() => {
+                    loadUserData(currentUserKey);
+                    authScreen.style.display = 'none';
+                    initApp();
+                }, 500); // pequeno delay para melhor visual
+            } else {
                 authScreen.style.display = 'flex';
                 showLoginForm();
             }
-        });
+        }
 
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Acesse o seu Dashboard na Nuvem</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Acesse o seu Dashboard Local</p>
                 <div id="loginErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleLogin(event)">
-                    <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="loginEmail" required></div>
+                    <div class="form-group" style="text-align: left;"><label>Utilizador</label><input type="text" class="form-control" id="loginUser" required placeholder="O seu nome de utilizador..."></div>
                     <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="loginPass" required></div>
                     <button type="submit" class="btn-primary" id="btnLoginBtn">Entrar</button>
                     <p style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;" onclick="showRegisterForm()">Não tem conta? <strong style="color: var(--primary-accent);">Criar Conta</strong></p>
@@ -956,16 +922,16 @@
                 <h2 style="margin-bottom: 10px;">Criar Conta</h2>
                 <div id="regErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleRegister(event)">
-                    <div class="form-group" style="text-align: left;"><label>Nome</label><input type="text" class="form-control" id="regName" required></div>
-                    <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="regEmail" required></div>
-                    <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="regPass" minlength="6" required></div>
+                    <div class="form-group" style="text-align: left;"><label>Utilizador (Login)</label><input type="text" class="form-control" id="regUser" required placeholder="Ex: joao123"></div>
+                    <div class="form-group" style="text-align: left;"><label>Nome de Apresentação</label><input type="text" class="form-control" id="regName" required placeholder="Ex: João Costa"></div>
+                    <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="regPass" minlength="4" required></div>
                     <div class="form-group" style="text-align: left;">
                         <label>Foto de Perfil</label>
                         <input type="file" class="file-input" id="regAvatarInput" accept="image/*" onchange="previewImage(event, 'regPreview')">
                         <img id="regPreview" class="user-avatar-img" style="width: 50px; height: 50px; display: none; margin-top: 10px;">
                         <input type="hidden" id="regAvatarData">
                     </div>
-                    <button type="submit" class="btn-primary" id="btnRegBtn">Criar e Entrar</button>
+                    <button type="submit" class="btn-primary" id="btnRegBtn">Criar Conta</button>
                     <p style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;" onclick="showLoginForm()">Já tem conta? <strong style="color: var(--primary-accent);">Entrar</strong></p>
                 </form>`;
         }
@@ -985,70 +951,127 @@
             }
         }
 
-        async function handleLogin(e) {
+        function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLoginBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            try {
-                isRegistering = false;
-                await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPass').value);
-            } catch(error) {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            
+            if (localDB[user] && localDB[user].password === pass) {
+                currentUserKey = user;
+                localStorage.setItem('finDash_currentUser', user);
+                checkAuth();
+            } else {
                 const errBox = document.getElementById('loginErrorContainer');
                 errBox.style.display = 'block';
-                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>E-mail ou senha incorretos.</span></div>`;
-                btn.innerHTML = 'Entrar'; btn.disabled = false;
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Utilizador ou senha incorretos.</span></div>`;
             }
         }
 
-        async function handleRegister(e) {
+        function handleRegister(e) {
             e.preventDefault();
-            isRegistering = true;
-            const btn = document.getElementById('btnRegBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(document.getElementById('regEmail').value, document.getElementById('regPass').value);
-                userData = { name: document.getElementById('regName').value.trim(), avatar: document.getElementById('regAvatarData').value || '' };
-                categories = [...defaultCategories];
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    userData, categories, transactions: [], financialGoals: [], creditCards: [], vaults: [], wallet: {name: "Carteira", balance: 0}, homeConfig
-                });
-                document.getElementById('authScreen').style.display = 'none';
-                initApp();
-            } catch(error) {
-                isRegistering = false;
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const name = document.getElementById('regName').value.trim();
+            const avatar = document.getElementById('regAvatarData').value || '';
+            
+            if (localDB[user]) {
                 const errBox = document.getElementById('regErrorContainer');
                 errBox.style.display = 'block';
-                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Erro ao registar. Verifique os dados.</span></div>`;
-                btn.innerHTML = 'Criar e Entrar'; btn.disabled = false;
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Este nome de utilizador já existe. Escolha outro.</span></div>`;
+                return;
             }
+
+            localDB[user] = {
+                password: pass,
+                userData: { name, avatar },
+                categories: [...defaultCategories],
+                transactions: [], financialGoals: [], creditCards: [], vaults: [], wallet: {name: "Carteira", balance: 0},
+                homeConfig: { 
+                    order: ['netBalance', 'pendenciasCard', 'creditCardsPreview', 'goalsPreview', 'categorySummary', 'vaultPreview'], 
+                    visibility: { netBalance: true, pendenciasCard: true, creditCardsPreview: true, goalsPreview: true, categorySummary: true, vaultPreview: true } 
+                }
+            };
+            
+            localStorage.setItem('finDash_users', JSON.stringify(localDB));
+            currentUserKey = user;
+            localStorage.setItem('finDash_currentUser', user);
+            checkAuth();
         }
 
-        async function loadUserData(uid) {
-            try {
-                const docSnap = await db.collection('users').doc(uid).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    userData = data.userData || { name: "Utilizador", avatar: "" };
-                    categories = data.categories || [...defaultCategories];
-                    transactions = data.transactions || [];
-                    financialGoals = data.financialGoals || [];
-                    creditCards = data.creditCards || [];
-                    vaults = data.vaults || [];
-                    wallet = data.wallet || { name: "Carteira", balance: 0 };
-                    if(data.homeConfig) homeConfig = data.homeConfig;
-                } else {
-                    userData = { name: "Utilizador", avatar: "" };
-                    categories = [...defaultCategories];
-                    await saveToStorage();
-                }
-            } catch(e) { console.error("Erro ao carregar dados:", e); }
+        function loadUserData(uid) {
+            if (localDB[uid]) {
+                const data = localDB[uid];
+                userData = data.userData || { name: "Utilizador", avatar: "" };
+                categories = data.categories && data.categories.length > 0 ? data.categories : [...defaultCategories];
+                transactions = data.transactions || [];
+                financialGoals = data.financialGoals || [];
+                creditCards = data.creditCards || [];
+                vaults = data.vaults || [];
+                wallet = data.wallet || { name: "Carteira", balance: 0 };
+                if(data.homeConfig) homeConfig = data.homeConfig;
+            }
         }
 
         function saveToStorage() { 
-            if (!auth.currentUser) return;
-            const dataToSave = { userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig };
-            db.collection('users').doc(auth.currentUser.uid).set(dataToSave).catch(err => console.error("Erro a salvar:", err));
+            if (!currentUserKey) return;
+            // Preservar a password existente
+            const currentPass = localDB[currentUserKey].password;
+            localDB[currentUserKey] = { 
+                password: currentPass,
+                userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig 
+            };
+            localStorage.setItem('finDash_users', JSON.stringify(localDB));
         }
+
+        // --- SISTEMA DE BACKUP ---
+        function exportBackup() {
+            if(!currentUserKey || !localDB[currentUserKey]) return;
+            const dataStr = JSON.stringify(localDB[currentUserKey], null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_financeiro_${currentUserKey}_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            closeMenuModal();
+        }
+
+        function triggerImport() {
+            document.getElementById('importBackupFile').click();
+        }
+
+        function handleImportBackup(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const importedData = JSON.parse(evt.target.result);
+                    if (importedData && importedData.userData) { 
+                        // Protege a senha atual do user e substitui os dados
+                        importedData.password = localDB[currentUserKey].password;
+                        localDB[currentUserKey] = importedData;
+                        localStorage.setItem('finDash_users', JSON.stringify(localDB));
+                        
+                        // Atualiza a app
+                        loadUserData(currentUserKey);
+                        updateUI();
+                        updateAccountLabels();
+                        closeMenuModal();
+                        showAlert("Sucesso", "Backup importado com sucesso!");
+                    } else {
+                        showAlert("Erro", "Ficheiro de backup inválido ou incompatível.");
+                    }
+                } catch(err) {
+                    showAlert("Erro", "Falha ao ler o ficheiro.");
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // reseta o input file
+        }
+        // -----------------------
 
         function applyTheme(theme) {
             currentTheme = theme;
@@ -1151,7 +1174,19 @@
                 document.getElementById('goalColorInput').value = '#3B82F6';
             }
         }
-        function rgbToHex(col){ if(col.charAt(0)=='r'){ col=col.replace('rgb(','').replace(')','').split(','); let r=parseInt(col[0],10).toString(16),g=parseInt(col[1],10).toString(16),b=parseInt(col[2],10).toString(16); r=r.length==1?'0'+r:r; g=g.length==1?'0'+g:g; b=b.length==1?'0'+b:b; return '#'+r+g+b; } return col; }
+        function rgbToHex(col) {
+            if (col && col.startsWith('rgb')) {
+                const vals = col.replace(/[^\d,]/g, '').split(',');
+                let r = parseInt(vals[0] || 0, 10).toString(16),
+                    g = parseInt(vals[1] || 0, 10).toString(16),
+                    b = parseInt(vals[2] || 0, 10).toString(16);
+                r = r.length === 1 ? '0' + r : r;
+                g = g.length === 1 ? '0' + g : g;
+                b = b.length === 1 ? '0' + b : b;
+                return '#' + r + g + b;
+            }
+            return col;
+        }
         
         function closeGoalModal() { document.getElementById('goalModal').classList.remove('active'); }
         function selectGoalIcon(iconClass, btn) { document.getElementById('goalIconInput').value = iconClass; document.querySelectorAll('#goalIconGrid .icon-option').forEach(el => el.classList.remove('selected')); if(btn) btn.classList.add('selected'); }
@@ -1240,7 +1275,13 @@
                 saveToStorage(); updateAccountLabels(); closeProfileModal();
             }
         }
-        function logoutUser() { showConfirm("Sair da Conta", "Tem certeza que deseja fazer logout?", () => { auth.signOut().then(() => window.location.reload()); }); }
+        
+        function logoutUser() { 
+            showConfirm("Sair da Conta", "Tem certeza que deseja sair?", () => { 
+                localStorage.removeItem('finDash_currentUser');
+                window.location.reload(); 
+            }); 
+        }
 
         function openDeleteAccountModal() { 
             closeProfileModal(); 
@@ -1248,26 +1289,17 @@
             document.getElementById('deleteAccountModal').classList.add('active'); 
         }
         function closeDeleteAccountModal() { document.getElementById('deleteAccountModal').classList.remove('active'); }
-        async function handleDeleteAccount(e) {
+        
+        function handleDeleteAccount(e) {
             e.preventDefault(); 
             const pass = document.getElementById('deleteAccountPassword').value; 
-            const btn = document.getElementById('btnDeleteAccount'); 
-            const user = auth.currentUser; 
-            if(!user) return;
-            
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
-            btn.disabled = true;
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
-                await user.reauthenticateWithCredential(credential);
-                await db.collection('users').doc(user.uid).delete();
-                await user.delete();
+            if(localDB[currentUserKey] && localDB[currentUserKey].password === pass) {
+                delete localDB[currentUserKey];
+                localStorage.setItem('finDash_users', JSON.stringify(localDB));
+                localStorage.removeItem('finDash_currentUser');
                 window.location.reload();
-            } catch (error) {
-                console.error(error); 
-                showAlert("Erro", "A senha está incorreta ou ocorreu um erro ao excluir a conta.");
-                btn.innerHTML = 'Confirmar Exclusão'; 
-                btn.disabled = false;
+            } else {
+                showAlert("Erro", "A senha está incorreta.");
             }
         }
 
@@ -1565,14 +1597,36 @@
             } else { showConfirm("Excluir Lançamento", "Deseja excluir este lançamento?", () => { transactions = transactions.filter(t => t.id !== id); saveToStorage(); updateUI(); }); } 
         }
         function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
-        function confirmDelete(mode) { const id = parseInt(document.getElementById('deleteTxId').value, 10), groupId = parseInt(document.getElementById('deleteTxGroupId').value, 10), targetTx = transactions.find(t => t.id === id); if(mode === 1) transactions = transactions.filter(t => t.id !== id); else if(mode === 2 && targetTx) transactions = transactions.filter(t => !(t.groupId === groupId && t.date >= targetTx.date)); closeDeleteModal(); saveToStorage(); updateUI(); }
+        function confirmDelete(mode) {
+            const id = parseInt(document.getElementById('deleteTxId').value, 10), 
+                  groupId = parseInt(document.getElementById('deleteTxGroupId').value, 10), 
+                  targetTx = transactions.find(t => t.id === id); 
+            if(mode === 1) {
+                transactions = transactions.filter(t => t.id !== id);
+            } else if (mode === 2 && targetTx) {
+                transactions = transactions.filter(t => !(t.groupId === groupId && t.date >= targetTx.date));
+            }
+            closeDeleteModal(); saveToStorage(); updateUI(); 
+        }
         
         function openCalcModal() { document.getElementById('calcModal').classList.add('active'); calcClear(); }
         function closeCalcModal() { document.getElementById('calcModal').classList.remove('active'); }
         function calcClear() { calcExpression = "0"; document.getElementById('calcDisplay').textContent = calcExpression; }
         function calcAppend(val) { if(calcExpression === "0" && !['+', '-', '*', '/'].includes(val)) calcExpression = val; else { const lastChar = calcExpression.slice(-1); const isOp = ['+', '-', '*', '/'].includes(val); const lastIsOp = ['+', '-', '*', '/'].includes(lastChar); if (isOp && lastIsOp) calcExpression = calcExpression.slice(0, -1) + val; else calcExpression += val; } document.getElementById('calcDisplay').textContent = calcExpression; }
         function calcBack() { if(calcExpression.length > 1) calcExpression = calcExpression.slice(0, -1); else calcExpression = "0"; document.getElementById('calcDisplay').textContent = calcExpression; }
-        function calcEquals() { try { const sanitized = calcExpression.replace(/[^0-9+\-*/.]/g, ''); if (!sanitized || ['+', '-', '*', '/'].includes(sanitized.slice(-1))) throw new Error('Inválido'); const result = eval(sanitized.replace('÷', '/').replace('×', '*')); if (isNaN(result) || !isFinite(result)) throw new Error('Inválido'); calcExpression = String(Math.round(result * 100) / 100); document.getElementById('calcDisplay').textContent = calcExpression; } catch(e) { document.getElementById('calcDisplay').textContent = "Erro"; calcExpression = "0"; } }
+        function calcEquals() {
+            try {
+                const sanitized = calcExpression.replace(/[^0-9+\-*\/.]/g, '');
+                if (!sanitized || ['+', '-', '*', '/'].includes(sanitized.slice(-1))) throw new Error('Inválido');
+                const result = new Function('return ' + sanitized)();
+                if (isNaN(result) || !isFinite(result)) throw new Error('Inválido');
+                calcExpression = String(Math.round(result * 100) / 100);
+                document.getElementById('calcDisplay').textContent = calcExpression;
+            } catch(e) {
+                document.getElementById('calcDisplay').textContent = "Erro";
+                calcExpression = "0";
+            }
+        }
         function useCalcResult() { let res = document.getElementById('calcDisplay').textContent; if(!isNaN(res)) { document.getElementById('txAmount').value = res; closeCalcModal(); } }
         
         function setChartFilter(type, btn) { currentChartFilter = type; document.querySelectorAll('#view-charts .filter-chip').forEach(c => c.classList.remove('active')); if(btn) btn.classList.add('active'); updateChart(); }
@@ -1594,15 +1648,16 @@
 
         function openWipeModal() { document.getElementById('wipePassword').value = ''; document.getElementById('wipeModal').classList.add('active'); }
         function closeWipeModal() { document.getElementById('wipeModal').classList.remove('active'); }
-        async function handleWipeAll(e) {
-            e.preventDefault(); const pass = document.getElementById('wipePassword').value; const btn = document.getElementById('btnWipeAll'); const user = auth.currentUser; if(!user) return;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
-                await user.reauthenticateWithCredential(credential);
+        function handleWipeAll(e) {
+            e.preventDefault(); 
+            const pass = document.getElementById('wipePassword').value; 
+            
+            if(localDB[currentUserKey] && localDB[currentUserKey].password === pass) {
                 transactions = []; creditCards = []; financialGoals = []; vaults = []; wallet = { name: "Carteira", balance: 0 }; categories = [...defaultCategories];
                 saveToStorage(); updateUI(); closeWipeModal(); showAlert("Sucesso", "O aplicativo foi redefinido com sucesso!");
-            } catch (error) { console.error(error); showAlert("Erro", "A senha está incorreta ou ocorreu um erro na validação."); } finally { btn.innerHTML = 'Confirmar Redefinição'; btn.disabled = false; }
+            } else {
+                showAlert("Erro", "A senha está incorreta.");
+            }
         }
 
         function openReportModal() { document.getElementById('reportModal').classList.add('active'); renderReport(); }
