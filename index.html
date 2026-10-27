@@ -6,9 +6,14 @@
     <meta name="theme-color" content="#0B1120" id="metaThemeColor">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard Financeiro Local</title>
+    <title>Dashboard Financeiro na Nuvem</title>
     
     <link rel="manifest" href="manifest.json">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -59,7 +64,7 @@
         
         #menuModal, #cardsConfigModal, #reportModal { z-index: 2000 !important; }
         #txModal, #vaultModal, #goalModal, #ccModal, #categoryModal { z-index: 2100 !important; }
-        #profileModal { z-index: 2200 !important; }
+        #profileModal, #changePasswordModal { z-index: 2200 !important; }
         #categoryPickerModal, #statusPickerModal, #frequencyPickerModal, #paymentPickerModal, #vaultRatePickerModal, #monthPickerModal { z-index: 2600 !important; }
         #calendarPickerModal { z-index: 2700 !important; }
         #deleteModal, #wipeModal, #deleteAccountModal, #walletModal, #calcModal { z-index: 2800 !important; }
@@ -76,7 +81,7 @@
         .header-actions { display: flex; gap: 8px; align-items: center; }
         
         .account-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.2); height: 38px; color: white; max-width: 140px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .user-avatar-img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #fff; }
+        .user-avatar-emoji { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
         .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; flex-shrink: 0; }
 
         .theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
@@ -199,8 +204,7 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
         .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--bg); color: var(--text); outline: none; }
-        .file-input { width: 100%; padding: 8px; border: 1px dashed var(--border); border-radius: 10px; background: var(--bg); color: var(--text); cursor: pointer; }
-
+        
         .type-selector { display: flex; gap: 10px; margin-bottom: 16px; }
         .type-btn { flex: 1; padding: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 10px; font-weight: 600; cursor: pointer; }
         .type-btn.active.receita { background: var(--success); color: white; border-color: var(--success); }
@@ -317,7 +321,7 @@
             <div class="header-top-left">
                 <button class="header-btn menu-large" onclick="openMenuModal()" title="Menu Principal"><i class="fa-solid fa-bars"></i></button>
                 <div class="account-badge" id="currentAccountLabel" onclick="openProfileModal()" title="Meu Perfil">
-                    <img id="userAvatarDisplay" class="user-avatar-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=">
+                    <div id="userAvatarDisplay" class="user-avatar-emoji">🐶</div>
                     <span id="userNameDisplay">Carregando...</span>
                 </div>
             </div>
@@ -707,6 +711,7 @@
         </div>
     </div>
 
+    <!-- Modal do Perfil com Avatar de Animal -->
     <div class="modal" id="profileModal" onclick="checkModalClose(event, 'profileModal')">
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeProfileModal()"></div>
@@ -717,18 +722,29 @@
                     <input type="text" class="form-control" id="profileNameInput" required>
                 </div>
                 <div class="form-group">
-                    <label>Foto de Perfil</label>
-                    <input type="file" class="file-input" id="profileImageInput" accept="image/*" onchange="previewImage(event, 'profilePreview')">
-                    <div style="margin-top: 10px; text-align: center;">
-                        <img id="profilePreview" class="user-avatar-img" style="width: 80px; height: 80px; display: none;">
-                    </div>
-                    <input type="hidden" id="profileAvatarData">
+                    <label>Escolha o seu Avatar</label>
+                    <div class="icon-grid" id="profileAvatarGridContainer" style="grid-template-columns: repeat(4, 1fr);"></div>
+                    <input type="hidden" id="profileAvatarData" value="🐶">
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
-                    <button type="submit" class="btn-primary">Salvar / Atualizar</button>
+                    <button type="submit" class="btn-primary">Salvar / Atualizar Perfil</button>
+                    <button type="button" class="btn-primary" style="background: transparent; border: 1px solid var(--primary-accent); color: var(--primary-accent);" onclick="openChangePasswordModal()">Alterar Senha</button>
                     <button type="button" class="btn-primary" style="background: var(--warning); border: none; color: white;" onclick="logoutUser()">Sair da Conta</button>
                     <button type="button" class="btn-primary" style="background: transparent; border: 1px solid var(--danger); color: var(--danger);" onclick="openDeleteAccountModal()">Excluir Conta Permanentemente</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Alterar Senha -->
+    <div class="modal" id="changePasswordModal" onclick="checkModalClose(event, 'changePasswordModal')">
+        <div class="modal-content">
+            <div class="modal-handle-bar" onclick="closeChangePasswordModal()"></div>
+            <div class="modal-header"><h3>Alterar Senha</h3><button class="close-btn-minimal" type="button" onclick="closeChangePasswordModal()">✕</button></div>
+            <form onsubmit="handleChangePasswordSubmit(event)">
+                <div class="form-group"><label>Nova Senha</label><input type="password" class="form-control" id="newPassword" minlength="6" required></div>
+                <div class="form-group"><label>Confirmar Nova Senha</label><input type="password" class="form-control" id="confirmNewPassword" minlength="6" required></div>
+                <button type="submit" class="btn-primary" id="btnChangePass">Atualizar Senha</button>
             </form>
         </div>
     </div>
@@ -737,7 +753,7 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeDeleteAccountModal()"></div>
             <div class="modal-header"><h3>Excluir Conta</h3><button class="close-btn-minimal" type="button" onclick="closeDeleteAccountModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação é <strong>IRREVERSÍVEL</strong>. Todos os seus dados locais desta conta serão apagados permanentemente.<br><br>Confirme digitando a sua senha:</p>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação é <strong>IRREVERSÍVEL</strong>. Todos os seus dados da nuvem serão apagados permanentemente.<br><br>Confirme digitando a sua senha:</p>
             <form onsubmit="handleDeleteAccount(event)">
                 <div class="form-group"><input type="password" class="form-control" id="deleteAccountPassword" required placeholder="Senha..."></div>
                 <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnDeleteAccount">Confirmar Exclusão</button>
@@ -758,7 +774,7 @@
         <div class="modal-content">
             <div class="modal-handle-bar" onclick="closeWipeModal()"></div>
             <div class="modal-header"><h3>Redefinir Aplicativo</h3><button class="close-btn-minimal" onclick="closeWipeModal()">✕</button></div>
-            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação apagará TODOS os lançamentos financeiros da sua conta. Confirme com a sua senha:</p>
+            <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Esta ação apagará TODOS os lançamentos financeiros da nuvem. Confirme com a sua senha:</p>
             <form onsubmit="handleWipeAll(event)">
                 <div class="form-group"><input type="password" class="form-control" id="wipePassword" required placeholder="Senha..."></div>
                 <button type="submit" class="btn-primary" style="background: var(--danger); border: none;" id="btnWipeAll">Confirmar Redefinição</button>
@@ -843,9 +859,18 @@
         }
         function closeCustomAlert() { document.getElementById('customAlertModal').classList.remove('active'); }
 
-        // Variáveis Locais em vez de Firebase
-        let localDB = JSON.parse(localStorage.getItem('finDash_users')) || {};
-        let currentUserKey = localStorage.getItem('finDash_currentUser');
+        const firebaseConfig = {
+            apiKey: "AIzaSyD95syW4nmNEkoTzhlDcdnOahkQQ0_ZgjY",
+            authDomain: "dashboard-financeiro-572a4.firebaseapp.com",
+            projectId: "dashboard-financeiro-572a4",
+            storageBucket: "dashboard-financeiro-572a4.firebasestorage.app",
+            messagingSenderId: "602198336399",
+            appId: "1:602198336399:web:7504565dec3fd7a68f21fa"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         const defaultCategories = [ 
             { name: "Moradia", type: "Despesa", icon: "fa-solid fa-house", budget: 0 }, 
@@ -884,36 +909,67 @@
         let stagedCalendarDate = null; 
         let currentCalendarTarget = 'tx';
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
+        let isRegistering = false;
 
-        window.addEventListener('DOMContentLoaded', checkAuth);
+        const animalAvatars = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+        
+        function getAvatarGridHtml(selectedId = '🐶', targetInput = 'regAvatarData') {
+            return animalAvatars.map(a => `<div class="icon-option ${a === selectedId ? 'selected' : ''}" onclick="selectEmojiAvatar('${a}', '${targetInput}', this)" style="font-size: 1.5rem;">${a}</div>`).join('');
+        }
+        function selectEmojiAvatar(emoji, inputId, btn) {
+            document.getElementById(inputId).value = emoji;
+            const container = btn.parentElement;
+            container.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
 
-        function checkAuth() {
+        auth.onAuthStateChanged(async (user) => {
             const authScreen = document.getElementById('authScreen');
-            if (currentUserKey && localDB[currentUserKey]) {
+            if (user && !isRegistering) {
                 authScreen.style.display = 'flex';
                 document.getElementById('authCardContent').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-accent); margin-bottom:15px;"></i><p>A Carregar Dados...</p>';
+                await loadUserData(user.uid);
                 
-                setTimeout(() => {
-                    loadUserData(currentUserKey);
-                    authScreen.style.display = 'none';
-                    initApp();
-                }, 500); // pequeno delay para melhor visual
-            } else {
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } catch(e) {
+                    console.error("Erro ao atualizar login no Firebase:", e);
+                }
+
+                authScreen.style.display = 'none';
+                initApp();
+            } else if (!user) {
                 authScreen.style.display = 'flex';
                 showLoginForm();
             }
-        }
+        });
 
         function showLoginForm() {
             document.getElementById('authCardContent').innerHTML = `
                 <h2 style="margin-bottom: 10px;">Entrar</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Acesse o seu Dashboard Local</p>
                 <div id="loginErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleLogin(event)">
-                    <div class="form-group" style="text-align: left;"><label>Utilizador</label><input type="text" class="form-control" id="loginUser" required placeholder="O seu nome de utilizador..."></div>
+                    <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="loginEmail" required></div>
                     <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="loginPass" required></div>
                     <button type="submit" class="btn-primary" id="btnLoginBtn">Entrar</button>
-                    <p style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;" onclick="showRegisterForm()">Não tem conta? <strong style="color: var(--primary-accent);">Criar Conta</strong></p>
+                    <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:0.85rem;">
+                        <span style="color:var(--primary-accent); cursor:pointer; font-weight:600;" onclick="showRecoveryForm()">Esqueci a senha</span>
+                        <span style="color:var(--text-muted); cursor:pointer;" onclick="showRegisterForm()">Criar <strong style="color: var(--primary-accent);">Conta</strong></span>
+                    </div>
+                </form>`;
+        }
+
+        function showRecoveryForm() {
+            document.getElementById('authCardContent').innerHTML = `
+                <h2 style="margin-bottom: 10px;">Recuperar Senha</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Digite o seu e-mail para receber o link de redefinição.</p>
+                <div id="recErrorContainer" style="display: none; margin-bottom: 16px;"></div>
+                <form onsubmit="handleRecovery(event)">
+                    <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="recEmail" required></div>
+                    <button type="submit" class="btn-primary" id="btnRecBtn">Enviar Link</button>
+                    <p style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;" onclick="showLoginForm()">Voltar para o <strong style="color: var(--primary-accent);">Login</strong></p>
                 </form>`;
         }
 
@@ -922,156 +978,149 @@
                 <h2 style="margin-bottom: 10px;">Criar Conta</h2>
                 <div id="regErrorContainer" style="display: none; margin-bottom: 16px;"></div>
                 <form onsubmit="handleRegister(event)">
-                    <div class="form-group" style="text-align: left;"><label>Utilizador (Login)</label><input type="text" class="form-control" id="regUser" required placeholder="Ex: joao123"></div>
-                    <div class="form-group" style="text-align: left;"><label>Nome de Apresentação</label><input type="text" class="form-control" id="regName" required placeholder="Ex: João Costa"></div>
-                    <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="regPass" minlength="4" required></div>
+                    <div class="form-group" style="text-align: left;"><label>Nome</label><input type="text" class="form-control" id="regName" required></div>
+                    <div class="form-group" style="text-align: left;"><label>E-mail</label><input type="email" class="form-control" id="regEmail" required></div>
+                    <div class="form-group" style="text-align: left;"><label>Senha</label><input type="password" class="form-control" id="regPass" minlength="6" required></div>
                     <div class="form-group" style="text-align: left;">
-                        <label>Foto de Perfil</label>
-                        <input type="file" class="file-input" id="regAvatarInput" accept="image/*" onchange="previewImage(event, 'regPreview')">
-                        <img id="regPreview" class="user-avatar-img" style="width: 50px; height: 50px; display: none; margin-top: 10px;">
-                        <input type="hidden" id="regAvatarData">
+                        <label>Avatar de Perfil</label>
+                        <div class="icon-grid" id="regAvatarGrid" style="grid-template-columns: repeat(4, 1fr);">
+                            ${getAvatarGridHtml('🐶', 'regAvatarData')}
+                        </div>
+                        <input type="hidden" id="regAvatarData" value="🐶">
                     </div>
-                    <button type="submit" class="btn-primary" id="btnRegBtn">Criar Conta</button>
+                    <button type="submit" class="btn-primary" id="btnRegBtn">Criar e Entrar</button>
                     <p style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;" onclick="showLoginForm()">Já tem conta? <strong style="color: var(--primary-accent);">Entrar</strong></p>
                 </form>`;
         }
 
-        function previewImage(event, previewId) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(previewId);
-                    img.src = e.target.result;
-                    img.style.display = 'inline-block';
-                    if (previewId === 'regPreview') document.getElementById('regAvatarData').value = e.target.result;
-                    else if (previewId === 'profilePreview') document.getElementById('profileAvatarData').value = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLoginBtn');
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value;
-            
-            if (localDB[user] && localDB[user].password === pass) {
-                currentUserKey = user;
-                localStorage.setItem('finDash_currentUser', user);
-                checkAuth();
-            } else {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                isRegistering = false;
+                await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPass').value);
+            } catch(error) {
                 const errBox = document.getElementById('loginErrorContainer');
                 errBox.style.display = 'block';
-                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Utilizador ou senha incorretos.</span></div>`;
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>E-mail ou senha incorretos.</span></div>`;
+                btn.innerHTML = 'Entrar'; btn.disabled = false;
             }
         }
 
-        function handleRegister(e) {
+        async function handleRecovery(e) {
             e.preventDefault();
-            const user = document.getElementById('regUser').value.trim();
-            const pass = document.getElementById('regPass').value;
-            const name = document.getElementById('regName').value.trim();
-            const avatar = document.getElementById('regAvatarData').value || '';
-            
-            if (localDB[user]) {
+            const btn = document.getElementById('btnRecBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                await auth.sendPasswordResetEmail(document.getElementById('recEmail').value);
+                const errBox = document.getElementById('recErrorContainer');
+                errBox.style.display = 'block';
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fa-solid fa-check"></i><span>Link enviado! Verifique a sua caixa de entrada.</span></div>`;
+            } catch(error) {
+                const errBox = document.getElementById('recErrorContainer');
+                errBox.style.display = 'block';
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Erro ao enviar o link.</span></div>`;
+            }
+            btn.innerHTML = 'Enviar Link'; btn.disabled = false;
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            isRegistering = true;
+            const btn = document.getElementById('btnRegBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(document.getElementById('regEmail').value, document.getElementById('regPass').value);
+                userData = { name: document.getElementById('regName').value.trim(), avatar: document.getElementById('regAvatarData').value || '🐶' };
+                categories = [...defaultCategories];
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    userData, categories, transactions: [], financialGoals: [], creditCards: [], vaults: [], wallet: {name: "Carteira", balance: 0}, homeConfig,
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('authScreen').style.display = 'none';
+                initApp();
+            } catch(error) {
+                isRegistering = false;
                 const errBox = document.getElementById('regErrorContainer');
                 errBox.style.display = 'block';
-                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Este nome de utilizador já existe. Escolha outro.</span></div>`;
-                return;
+                errBox.innerHTML = `<div class="alert-banner" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i><span>Erro ao registar. Verifique se o email já existe.</span></div>`;
+                btn.innerHTML = 'Criar e Entrar'; btn.disabled = false;
             }
-
-            localDB[user] = {
-                password: pass,
-                userData: { name, avatar },
-                categories: [...defaultCategories],
-                transactions: [], financialGoals: [], creditCards: [], vaults: [], wallet: {name: "Carteira", balance: 0},
-                homeConfig: { 
-                    order: ['netBalance', 'pendenciasCard', 'creditCardsPreview', 'goalsPreview', 'categorySummary', 'vaultPreview'], 
-                    visibility: { netBalance: true, pendenciasCard: true, creditCardsPreview: true, goalsPreview: true, categorySummary: true, vaultPreview: true } 
-                }
-            };
-            
-            localStorage.setItem('finDash_users', JSON.stringify(localDB));
-            currentUserKey = user;
-            localStorage.setItem('finDash_currentUser', user);
-            checkAuth();
         }
 
-        function loadUserData(uid) {
-            if (localDB[uid]) {
-                const data = localDB[uid];
-                userData = data.userData || { name: "Utilizador", avatar: "" };
-                categories = data.categories && data.categories.length > 0 ? data.categories : [...defaultCategories];
-                transactions = data.transactions || [];
-                financialGoals = data.financialGoals || [];
-                creditCards = data.creditCards || [];
-                vaults = data.vaults || [];
-                wallet = data.wallet || { name: "Carteira", balance: 0 };
-                if(data.homeConfig) homeConfig = data.homeConfig;
-            }
+        async function loadUserData(uid) {
+            try {
+                const docSnap = await db.collection('users').doc(uid).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    userData = data.userData || { name: "Utilizador", avatar: "🐶" };
+                    categories = data.categories && data.categories.length > 0 ? data.categories : [...defaultCategories];
+                    transactions = data.transactions || [];
+                    financialGoals = data.financialGoals || [];
+                    creditCards = data.creditCards || [];
+                    vaults = data.vaults || [];
+                    wallet = data.wallet || { name: "Carteira", balance: 0 };
+                    if(data.homeConfig) homeConfig = data.homeConfig;
+                } else {
+                    userData = { name: "Utilizador", avatar: "🐶" };
+                    categories = [...defaultCategories];
+                    await saveToStorage();
+                }
+            } catch(e) { console.error("Erro ao carregar dados:", e); }
         }
 
         function saveToStorage() { 
-            if (!currentUserKey) return;
-            // Preservar a password existente
-            const currentPass = localDB[currentUserKey].password;
-            localDB[currentUserKey] = { 
-                password: currentPass,
-                userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig 
-            };
-            localStorage.setItem('finDash_users', JSON.stringify(localDB));
+            if (!auth.currentUser) return;
+            const dataToSave = { userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig };
+            db.collection('users').doc(auth.currentUser.uid).set(dataToSave, { merge: true }).catch(err => console.error("Erro a salvar:", err));
         }
 
-        // --- SISTEMA DE BACKUP ---
+        // --- SISTEMA DE BACKUP ONLINE ---
         function exportBackup() {
-            if(!currentUserKey || !localDB[currentUserKey]) return;
-            const dataStr = JSON.stringify(localDB[currentUserKey], null, 2);
+            if(!auth.currentUser) return;
+            const dataToExport = { userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig };
+            const dataStr = JSON.stringify(dataToExport, null, 2);
             const blob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `backup_financeiro_${currentUserKey}_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `backup_financeiro_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
             closeMenuModal();
         }
 
-        function triggerImport() {
-            document.getElementById('importBackupFile').click();
-        }
+        function triggerImport() { document.getElementById('importBackupFile').click(); }
 
         function handleImportBackup(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if(!file || !auth.currentUser) return;
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = async function(evt) {
                 try {
                     const importedData = JSON.parse(evt.target.result);
                     if (importedData && importedData.userData) { 
-                        // Protege a senha atual do user e substitui os dados
-                        importedData.password = localDB[currentUserKey].password;
-                        localDB[currentUserKey] = importedData;
-                        localStorage.setItem('finDash_users', JSON.stringify(localDB));
+                        userData = importedData.userData;
+                        categories = importedData.categories || [...defaultCategories];
+                        transactions = importedData.transactions || [];
+                        financialGoals = importedData.financialGoals || [];
+                        creditCards = importedData.creditCards || [];
+                        vaults = importedData.vaults || [];
+                        wallet = importedData.wallet || { name: "Carteira", balance: 0 };
+                        if(importedData.homeConfig) homeConfig = importedData.homeConfig;
                         
-                        // Atualiza a app
-                        loadUserData(currentUserKey);
+                        saveToStorage(); // Sincroniza com a nuvem Firebase
                         updateUI();
                         updateAccountLabels();
                         closeMenuModal();
-                        showAlert("Sucesso", "Backup importado com sucesso!");
-                    } else {
-                        showAlert("Erro", "Ficheiro de backup inválido ou incompatível.");
-                    }
-                } catch(err) {
-                    showAlert("Erro", "Falha ao ler o ficheiro.");
-                }
+                        showAlert("Sucesso", "Backup importado para a nuvem com sucesso!");
+                    } else { showAlert("Erro", "Ficheiro de backup inválido ou incompatível."); }
+                } catch(err) { showAlert("Erro", "Falha ao ler o ficheiro."); }
             };
             reader.readAsText(file);
-            e.target.value = ''; // reseta o input file
+            e.target.value = '';
         }
-        // -----------------------
 
         function applyTheme(theme) {
             currentTheme = theme;
@@ -1177,12 +1226,8 @@
         function rgbToHex(col) {
             if (col && col.startsWith('rgb')) {
                 const vals = col.replace(/[^\d,]/g, '').split(',');
-                let r = parseInt(vals[0] || 0, 10).toString(16),
-                    g = parseInt(vals[1] || 0, 10).toString(16),
-                    b = parseInt(vals[2] || 0, 10).toString(16);
-                r = r.length === 1 ? '0' + r : r;
-                g = g.length === 1 ? '0' + g : g;
-                b = b.length === 1 ? '0' + b : b;
+                let r = parseInt(vals[0] || 0, 10).toString(16), g = parseInt(vals[1] || 0, 10).toString(16), b = parseInt(vals[2] || 0, 10).toString(16);
+                r = r.length === 1 ? '0' + r : r; g = g.length === 1 ? '0' + g : g; b = b.length === 1 ? '0' + b : b;
                 return '#' + r + g + b;
             }
             return col;
@@ -1258,13 +1303,13 @@
         
         function openProfileModal() {
             document.getElementById('profileModal').classList.add('active');
-            const uData = userData || { name: "", avatar: "" };
+            const uData = userData || { name: "", avatar: "🐶" };
             document.getElementById('profileNameInput').value = uData.name || '';
-            const preview = document.getElementById('profilePreview');
-            if(uData.avatar) { preview.src = uData.avatar; preview.style.display = 'inline-block'; document.getElementById('profileAvatarData').value = uData.avatar; }
-            else { preview.style.display = 'none'; document.getElementById('profileAvatarData').value = ''; }
+            document.getElementById('profileAvatarData').value = uData.avatar || '🐶';
+            document.getElementById('profileAvatarGridContainer').innerHTML = getAvatarGridHtml(uData.avatar || '🐶', 'profileAvatarData');
         }
         function closeProfileModal() { document.getElementById('profileModal').classList.remove('active'); }
+        
         function handleProfileFormSubmit(e) {
             e.preventDefault();
             const newName = document.getElementById('profileNameInput').value.trim();
@@ -1276,12 +1321,39 @@
             }
         }
         
-        function logoutUser() { 
-            showConfirm("Sair da Conta", "Tem certeza que deseja sair?", () => { 
-                localStorage.removeItem('finDash_currentUser');
-                window.location.reload(); 
-            }); 
+        function openChangePasswordModal() {
+            closeProfileModal();
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+            document.getElementById('changePasswordModal').classList.add('active');
         }
+        function closeChangePasswordModal() { document.getElementById('changePasswordModal').classList.remove('active'); }
+        
+        async function handleChangePasswordSubmit(e) {
+            e.preventDefault();
+            const np = document.getElementById('newPassword').value;
+            const cp = document.getElementById('confirmNewPassword').value;
+            if(np !== cp) { showAlert("Erro", "As senhas não coincidem."); return; }
+            
+            const btn = document.getElementById('btnChangePass');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                await auth.currentUser.updatePassword(np);
+                showAlert("Sucesso", "A senha foi atualizada com sucesso!");
+                closeChangePasswordModal();
+            } catch(error) {
+                console.error(error);
+                if (error.code === 'auth/requires-recent-login') {
+                    showAlert("Sessão Expirada", "Por segurança, faça login novamente para alterar a sua senha.");
+                    auth.signOut().then(() => window.location.reload());
+                } else {
+                    showAlert("Erro", "Ocorreu um erro ao atualizar a senha.");
+                }
+            }
+            btn.innerHTML = 'Atualizar Senha'; btn.disabled = false;
+        }
+        
+        function logoutUser() { showConfirm("Sair da Conta", "Tem certeza que deseja sair?", () => { auth.signOut().then(() => window.location.reload()); }); }
 
         function openDeleteAccountModal() { 
             closeProfileModal(); 
@@ -1290,16 +1362,24 @@
         }
         function closeDeleteAccountModal() { document.getElementById('deleteAccountModal').classList.remove('active'); }
         
-        function handleDeleteAccount(e) {
+        async function handleDeleteAccount(e) {
             e.preventDefault(); 
             const pass = document.getElementById('deleteAccountPassword').value; 
-            if(localDB[currentUserKey] && localDB[currentUserKey].password === pass) {
-                delete localDB[currentUserKey];
-                localStorage.setItem('finDash_users', JSON.stringify(localDB));
-                localStorage.removeItem('finDash_currentUser');
+            const btn = document.getElementById('btnDeleteAccount'); 
+            const user = auth.currentUser; 
+            if(!user) return;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+                await user.reauthenticateWithCredential(credential);
+                await db.collection('users').doc(user.uid).delete();
+                await user.delete();
                 window.location.reload();
-            } else {
-                showAlert("Erro", "A senha está incorreta.");
+            } catch (error) {
+                console.error(error); 
+                showAlert("Erro", "A senha está incorreta ou ocorreu um erro ao excluir a conta.");
+                btn.innerHTML = 'Confirmar Exclusão'; btn.disabled = false;
             }
         }
 
@@ -1308,10 +1388,7 @@
                 const nameEl = document.getElementById('userNameDisplay');
                 const avatarEl = document.getElementById('userAvatarDisplay');
                 if(nameEl) nameEl.textContent = userData.name || "Utilizador";
-                if(avatarEl) {
-                    if(userData.avatar) { avatarEl.src = userData.avatar; avatarEl.style.display = 'inline-block'; }
-                    else { avatarEl.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII='; }
-                }
+                if(avatarEl) avatarEl.textContent = userData.avatar || "🐶";
             } 
         }
 
@@ -1648,16 +1725,21 @@
 
         function openWipeModal() { document.getElementById('wipePassword').value = ''; document.getElementById('wipeModal').classList.add('active'); }
         function closeWipeModal() { document.getElementById('wipeModal').classList.remove('active'); }
-        function handleWipeAll(e) {
+        
+        async function handleWipeAll(e) {
             e.preventDefault(); 
             const pass = document.getElementById('wipePassword').value; 
+            const btn = document.getElementById('btnWipeAll'); 
+            const user = auth.currentUser; 
+            if(!user) return;
             
-            if(localDB[currentUserKey] && localDB[currentUserKey].password === pass) {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+                await user.reauthenticateWithCredential(credential);
                 transactions = []; creditCards = []; financialGoals = []; vaults = []; wallet = { name: "Carteira", balance: 0 }; categories = [...defaultCategories];
-                saveToStorage(); updateUI(); closeWipeModal(); showAlert("Sucesso", "O aplicativo foi redefinido com sucesso!");
-            } else {
-                showAlert("Erro", "A senha está incorreta.");
-            }
+                saveToStorage(); updateUI(); closeWipeModal(); showAlert("Sucesso", "O aplicativo foi redefinido com sucesso na nuvem!");
+            } catch (error) { console.error(error); showAlert("Erro", "A senha está incorreta ou ocorreu um erro na validação."); } finally { btn.innerHTML = 'Confirmar Redefinição'; btn.disabled = false; }
         }
 
         function openReportModal() { document.getElementById('reportModal').classList.add('active'); renderReport(); }
