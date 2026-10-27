@@ -56,7 +56,33 @@
 
         header { background: var(--header-bg); color: white; padding: 20px 20px 25px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); position: relative; z-index: 1000; }
         .account-badge { position: relative; z-index: 1001; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; padding: 14px 0 18px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; border-top: 1px solid var(--border); }
+        
+        /* -- MENU EM PÍLULA FLUTUANTE -- */
+        .nav-bar { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; 
+            padding: 10px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            border-radius: 40px; z-index: 1000; border: 1px solid var(--border); 
+            width: 90%; max-width: 450px; gap: 8px;
+        }
+        [data-theme="light"] .nav-bar { box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .nav-item { 
+            background: none; border: none; display: flex; flex-direction: column; align-items: center; 
+            color: var(--text-muted); font-size: 0.7rem; gap: 4px; cursor: pointer; font-weight: 600; 
+            padding: 4px; transition: color 0.2s; width: 60px;
+        }
+        .nav-item i { font-size: 1.4rem; transition: transform 0.2s; }
+        .nav-item.active { color: var(--text); }
+        .nav-item.active i { transform: translateY(-3px); color: var(--primary-accent); }
+        .fab-btn { 
+            background: var(--primary-accent); color: #FFF; width: 50px; height: 50px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; font-weight: 800; border: none; flex-shrink: 0; cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); margin: 0 5px; transition: transform 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.95); }
+        .sidebar-brand, .fab-btn-text { display: none; }
+        /* -------------------------------- */
         
         #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; flex-direction: column; }
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: flex-end; backdrop-filter: blur(4px); z-index: 2000; }
@@ -69,6 +95,12 @@
         #calendarPickerModal { z-index: 2700 !important; }
         #deleteModal, #wipeModal, #deleteAccountModal, #walletModal, #calcModal { z-index: 2800 !important; }
         #customConfirmModal, #customAlertModal { z-index: 5000 !important; align-items: center !important; }
+
+        /* -- NOTIFICAÇÕES TOAST -- */
+        .toast-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; pointer-events: none; }
+        .toast { background: var(--card-bg); color: var(--text); padding: 14px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border); font-size: 0.9rem; font-weight: 600; opacity: 0; animation: toastIn 0.3s forwards; display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+        [data-theme="light"] .toast { box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         @supports (-webkit-touch-callout: default) {
             header { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
@@ -186,13 +218,6 @@
         .calc-btn.eq { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); }
         .calc-btn.clr { background: var(--danger); color: #fff; border-color: var(--danger); }
 
-        .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.75rem; gap: 4px; cursor: pointer; font-weight: 600; padding: 2px; width: 65px; transition: color 0.2s; }
-        .nav-item i { font-size: 1.4rem; transition: transform 0.2s; }
-        .nav-item.active { color: var(--text); font-weight: 700; }
-        .nav-item.active i { transform: translateY(-3px); color: var(--primary-accent); }
-        
-        .fab-btn { background: var(--primary-accent); color: #FFF; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; border: 3px solid var(--card-bg); margin-top: -30px; flex-shrink: 0; cursor: pointer; }
-        
         .menu-option { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 10px; width: 100%; text-align: left; transition: transform 0.2s; }
         .menu-option .icon-box { width: 32px; height: 32px; font-size: 1.1rem; }
         
@@ -239,9 +264,6 @@
         .drag-handle { color: var(--text-muted); padding-right: 12px; font-size: 1.2rem; cursor: grab; }
         .drag-content { flex: 1; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; color: var(--text); }
 
-        .sidebar-brand { display: none; }
-        .fab-btn-text { display: none; }
-
         @media (min-width: 768px) {
             body { padding-bottom: 0; padding-left: 260px; }
             .container { max-width: 1400px; padding: 30px 40px; }
@@ -249,8 +271,10 @@
             .header-top { grid-column: 1 / -1; margin-bottom: 10px; }
             .month-selector { margin-bottom: 0; height: 100%; font-size: 1.1rem; }
             .wallet-banner { margin-bottom: 0; }
+            
+            /* DOCK PÍLULA NO DESKTOP PASSA PARA SIDEBAR */
             .nav-bar {
-                top: 0; bottom: 0; left: 0; right: auto; width: 260px;
+                top: 0; bottom: 0; left: 0; right: auto; width: 260px; transform: none;
                 flex-direction: column; justify-content: flex-start;
                 padding: 20px 0; border-top: none;
                 border-right: 1px solid var(--border);
@@ -278,6 +302,7 @@
             [data-theme="light"] .nav-item:hover { background: rgba(0,0,0,0.05); }
             .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary-accent); }
             .nav-item.active i { transform: none; }
+            
             #homeContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
             .balance-card-custom, .pendencias-card, .home-card-wrapper { margin: 0; height: 100%; }
             .card { height: 100%; }
@@ -311,6 +336,9 @@
     </style>
 </head>
 <body data-theme="dark">
+
+    <!-- NOVO: Toast Notifications Flutuantes -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <div id="authScreen" style="display: none;">
         <div class="auth-card" id="authCardContent"></div>
@@ -412,7 +440,7 @@
         </div>
     </div>
 
-    <!-- Navegação -->
+    <!-- Navegação Estilo Pílula -->
     <nav class="nav-bar" id="bottomNavBar">
         <div class="sidebar-brand"><i class="fa-solid fa-cloud"></i> FinanceDash</div>
         <button class="nav-item active" onclick="switchView('dashboard', this)"><i class="fa-solid fa-chart-line"></i><span>Início</span></button>
@@ -424,7 +452,7 @@
         <button class="nav-item" onclick="switchView('creditcard', this)"><i class="fa-solid fa-credit-card"></i><span>Cartões</span></button>
     </nav>
 
-    <!-- Modals -->
+    <!-- Modals Originais Mantidos Intactos -->
     <div class="modal" id="customConfirmModal" onclick="checkModalClose(event, 'customConfirmModal')">
         <div class="modal-content" style="margin: auto; max-width: 350px; border-radius: 20px;">
             <h3 id="confirmTitle" style="margin-bottom: 12px;">Confirmar</h3>
@@ -701,6 +729,9 @@
             
             <div style="height: 1px; background: var(--border); margin: 15px 0;"></div>
             
+            <!-- NOVO BOTAO EXPORTAR CSV -->
+            <button class="menu-option" onclick="exportarCSV()"><div class="icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fa-solid fa-file-csv"></i></div> <span>Exportar Extrato (CSV)</span></button>
+            
             <button class="menu-option" onclick="exportBackup()"><div class="icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fa-solid fa-download"></i></div> <span>Exportar Backup (JSON)</span></button>
             <button class="menu-option" onclick="triggerImport()"><div class="icon-box" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);"><i class="fa-solid fa-upload"></i></div> <span>Importar Backup (JSON)</span></button>
             <input type="file" id="importBackupFile" accept=".json" style="display: none;" onchange="handleImportBackup(event)">
@@ -852,10 +883,14 @@
             closeCustomConfirm();
         });
 
+        // -- NOVO: TOAST NOTIFICATIONS (Substitui o antigo Alert obstrusivo) --
         function showAlert(title, message) {
-            document.getElementById('alertTitle').textContent = title;
-            document.getElementById('alertMessage').innerHTML = message;
-            document.getElementById('customAlertModal').classList.add('active');
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:var(--primary-accent); font-size:1.5rem;"></i> <div><strong style="color: var(--primary-accent); display:block;">${title}</strong><span style="font-size:0.8rem;">${message}</span></div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
         function closeCustomAlert() { document.getElementById('customAlertModal').classList.remove('active'); }
 
@@ -910,6 +945,7 @@
         let currentCalendarTarget = 'tx';
         let currentTheme = localStorage.getItem('naovaidar_theme') || 'dark';
         let isRegistering = false;
+        let txRenderLimit = 20; // NOVO: Paginação
 
         const animalAvatars = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦉'];
         
@@ -923,24 +959,45 @@
             btn.classList.add('selected');
         }
 
-        auth.onAuthStateChanged(async (user) => {
+        // -- NOVO: TEMPO REAL COM ONSNAPSHOT --
+        let unsubscribeSnapshot = null;
+        auth.onAuthStateChanged((user) => {
             const authScreen = document.getElementById('authScreen');
             if (user && !isRegistering) {
                 authScreen.style.display = 'flex';
                 document.getElementById('authCardContent').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-accent); margin-bottom:15px;"></i><p>A Carregar Dados...</p>';
-                await loadUserData(user.uid);
                 
-                try {
-                    await db.collection('users').doc(user.uid).set({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                } catch(e) {
-                    console.error("Erro ao atualizar login no Firebase:", e);
-                }
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+                unsubscribeSnapshot = db.collection('users').doc(user.uid).onSnapshot((docSnap) => {
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        userData = data.userData || { name: "Utilizador", avatar: "🐶" };
+                        categories = data.categories && data.categories.length > 0 ? data.categories : [...defaultCategories];
+                        transactions = data.transactions || [];
+                        financialGoals = data.financialGoals || [];
+                        creditCards = data.creditCards || [];
+                        vaults = data.vaults || [];
+                        wallet = data.wallet || { name: "Carteira", balance: 0 };
+                        if(data.homeConfig) homeConfig = data.homeConfig;
+                        
+                        updateUI();
+                        updateAccountLabels();
+                        authScreen.style.display = 'none';
+                    } else {
+                        userData = { name: "Utilizador", avatar: "🐶" };
+                        categories = [...defaultCategories];
+                        saveToStorage();
+                        authScreen.style.display = 'none';
+                    }
+                }, (error) => {
+                    console.error("Erro ao escutar dados:", error);
+                    authScreen.style.display = 'none';
+                });
 
-                authScreen.style.display = 'none';
+                db.collection('users').doc(user.uid).set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(e=>console.log(e));
                 initApp();
             } else if (!user) {
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
                 authScreen.style.display = 'flex';
                 showLoginForm();
             }
@@ -1049,27 +1106,6 @@
             }
         }
 
-        async function loadUserData(uid) {
-            try {
-                const docSnap = await db.collection('users').doc(uid).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    userData = data.userData || { name: "Utilizador", avatar: "🐶" };
-                    categories = data.categories && data.categories.length > 0 ? data.categories : [...defaultCategories];
-                    transactions = data.transactions || [];
-                    financialGoals = data.financialGoals || [];
-                    creditCards = data.creditCards || [];
-                    vaults = data.vaults || [];
-                    wallet = data.wallet || { name: "Carteira", balance: 0 };
-                    if(data.homeConfig) homeConfig = data.homeConfig;
-                } else {
-                    userData = { name: "Utilizador", avatar: "🐶" };
-                    categories = [...defaultCategories];
-                    await saveToStorage();
-                }
-            } catch(e) { console.error("Erro ao carregar dados:", e); }
-        }
-
         function saveToStorage() { 
             if (!auth.currentUser) return;
             const dataToSave = { userData, categories, transactions, financialGoals, creditCards, vaults, wallet, homeConfig };
@@ -1088,6 +1124,21 @@
             a.download = `backup_financeiro_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
+            closeMenuModal();
+        }
+
+        // --- NOVO: EXPORTAÇÃO CSV ---
+        function exportarCSV() {
+            if (!transactions || transactions.length === 0) { showAlert("Aviso", "Não há lançamentos para exportar."); return; }
+            let csv = "Data,Tipo,Categoria,Descrição,Valor,Status,Meio de Pagamento\n";
+            transactions.forEach(t => {
+                csv += `${t.date},${t.type},${t.category},"${t.desc}",${t.amount},${t.status},${t.paymentMethod}\n`;
+            });
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `extrato_${selectedMonthKey}.csv`;
+            link.click();
             closeMenuModal();
         }
 
@@ -1110,7 +1161,7 @@
                         wallet = importedData.wallet || { name: "Carteira", balance: 0 };
                         if(importedData.homeConfig) homeConfig = importedData.homeConfig;
                         
-                        saveToStorage(); // Sincroniza com a nuvem Firebase
+                        saveToStorage(); 
                         updateUI();
                         updateAccountLabels();
                         closeMenuModal();
@@ -1610,30 +1661,36 @@
             if(txContainer) {
                 txContainer.innerHTML = ''; 
                 if(filteredTxs.length === 0) txContainer.innerHTML = `<div class="empty-state">Nenhum lançamento.</div>`;
-                else { filteredTxs.forEach(t => { 
-                    const catObj = categories.find(c => c.name === t.category), iconClass = catObj ? catObj.icon || 'fa-solid fa-tag' : 'fa-solid fa-tag', catColor = getCategoryColor(t.category), dbStatus = t.status || 'Pago';
-                    const statusText = dbStatus === 'Pago' ? 'Pago' : 'Pendente'; const statusColor = dbStatus === 'Pago' ? 'var(--success)' : 'var(--warning)'; 
+                else { 
+                    // NOVO: Paginação
+                    filteredTxs.slice(0, txRenderLimit).forEach(t => { 
+                        const catObj = categories.find(c => c.name === t.category), iconClass = catObj ? catObj.icon || 'fa-solid fa-tag' : 'fa-solid fa-tag', catColor = getCategoryColor(t.category), dbStatus = t.status || 'Pago';
+                        const statusText = dbStatus === 'Pago' ? 'Pago' : 'Pendente'; const statusColor = dbStatus === 'Pago' ? 'var(--success)' : 'var(--warning)'; 
 
-                    const item = document.createElement('div'); item.className = 'list-item'; item.style.alignItems = 'flex-start'; item.style.padding = '14px 12px';
-                    item.innerHTML = `
-                        <div class="icon-box" style="background: ${catColor}1A; color: ${catColor}; border: 1px solid ${catColor}33; margin-right: 12px; margin-top: 2px;"><i class="${iconClass}"></i></div>
-                        <div class="item-info" style="flex: 1; min-width: 0;">
-                            <h4 style="font-size: 0.95rem; margin-bottom: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text); font-weight: 700;">${t.desc}</h4>
-                            <p style="font-size: 0.75rem; margin-bottom: 6px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text-muted);">${t.category} ${t.obs ? '• ' + t.obs : ''}</p>
-                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-regular fa-calendar"></i> ${formatDate(t.date)}</span>
-                                <span onclick="toggleTxStatus(${t.id})" style="cursor:pointer; display:inline-flex; align-items:center; gap:3px; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:6px; background:${statusColor}1A; color:${statusColor}; border: 1px solid ${statusColor}33; transition: transform 0.1s;"><i class="${dbStatus === 'Pago' ? 'fa-solid fa-check' : 'fa-regular fa-clock'}"></i> ${statusText}</span>
+                        const item = document.createElement('div'); item.className = 'list-item'; item.style.alignItems = 'flex-start'; item.style.padding = '14px 12px';
+                        item.innerHTML = `
+                            <div class="icon-box" style="background: ${catColor}1A; color: ${catColor}; border: 1px solid ${catColor}33; margin-right: 12px; margin-top: 2px;"><i class="${iconClass}"></i></div>
+                            <div class="item-info" style="flex: 1; min-width: 0;">
+                                <h4 style="font-size: 0.95rem; margin-bottom: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text); font-weight: 700;">${t.desc}</h4>
+                                <p style="font-size: 0.75rem; margin-bottom: 6px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color: var(--text-muted);">${t.category} ${t.obs ? '• ' + t.obs : ''}</p>
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-regular fa-calendar"></i> ${formatDate(t.date)}</span>
+                                    <span onclick="toggleTxStatus(${t.id})" style="cursor:pointer; display:inline-flex; align-items:center; gap:3px; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:6px; background:${statusColor}1A; color:${statusColor}; border: 1px solid ${statusColor}33; transition: transform 0.1s;"><i class="${dbStatus === 'Pago' ? 'fa-solid fa-check' : 'fa-regular fa-clock'}"></i> ${statusText}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; margin-left: 8px;">
-                            <div class="item-amount ${t.type}" style="font-size: 0.95rem; font-weight: 700; color: ${t.type === 'Receita' ? 'var(--success)' : 'var(--text)'};">${t.type === 'Receita' ? '+' : '-'} ${formatCurrency(t.amount)}</div>
-                            <div class="item-actions">
-                                <button onclick="openModal(${t.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="promptDelete(${t.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>`; 
-                    txContainer.appendChild(item); 
-                }); }
+                            <div class="item-right" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; margin-left: 8px;">
+                                <div class="item-amount ${t.type}" style="font-size: 0.95rem; font-weight: 700; color: ${t.type === 'Receita' ? 'var(--success)' : 'var(--text)'};">${t.type === 'Receita' ? '+' : '-'} ${formatCurrency(t.amount)}</div>
+                                <div class="item-actions">
+                                    <button onclick="openModal(${t.id})" class="action-icon-btn"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="promptDelete(${t.id})" class="action-icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>`; 
+                        txContainer.appendChild(item); 
+                    }); 
+                    if (filteredTxs.length > txRenderLimit) {
+                        txContainer.innerHTML += `<button class="btn-primary" style="margin-top: 10px; background: transparent; color: var(--primary-accent); border: 1px dashed var(--primary-accent);" onclick="txRenderLimit += 20; updateUI();">Carregar mais lançamentos</button>`;
+                    }
+                }
             }
 
             const ccContainer = document.getElementById('ccListContainer');
@@ -1766,8 +1823,8 @@
             const list = document.getElementById('configToggleList');
             list.innerHTML = '';
             
-            const names = { netBalance: 'Dashboard Analítico', pendenciasCard: 'Pendências', creditCardsPreview: 'Meus Cartões', goalsPreview: 'Metas', categorySummary: 'Resumo por Categoria', transactionsPreview: 'Últimas Movimentações (Extrato)', vaultPreview: 'Cofre' };
-            const icons = { netBalance: 'fa-chart-pie', pendenciasCard: 'fa-file-invoice-dollar', creditCardsPreview: 'fa-credit-card', goalsPreview: 'fa-bullseye', categorySummary: 'fa-tags', transactionsPreview: 'fa-list-ul', vaultPreview: 'fa-vault' };
+            const names = { netBalance: 'Dashboard Analítico', pendenciasCard: 'Pendências', creditCardsPreview: 'Meus Cartões', goalsPreview: 'Metas', categorySummary: 'Resumo por Categoria', vaultPreview: 'Cofre' };
+            const icons = { netBalance: 'fa-chart-pie', pendenciasCard: 'fa-file-invoice-dollar', creditCardsPreview: 'fa-credit-card', goalsPreview: 'fa-bullseye', categorySummary: 'fa-tags', vaultPreview: 'fa-vault' };
 
             homeConfig.order.forEach((key) => {
                 const div = document.createElement('div');
@@ -1836,6 +1893,17 @@
 
         function closeCardsConfigModal() { 
             document.getElementById('cardsConfigModal').classList.remove('active'); 
+        }
+
+        // --- SERVICE WORKER (PWA) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
+                    const CACHE_NAME = 'fin-dash-v2';
+                    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['/']))));
+                    self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
+                `));
+            });
         }
     </script>
 </body>
